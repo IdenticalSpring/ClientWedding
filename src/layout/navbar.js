@@ -84,15 +84,12 @@ export default function AppAppBar() {
       try {
         const decoded = jwtDecode(token);
         setAvatar(decoded.avatar || defaultAvatar); // Đặt avatar
-        setUserName(decoded.name || "User"); // Đặt tên (nếu không có, hiển thị mặc định là "User")
+        setUserName(decoded.name); // Đặt tên (nếu không có, hiển thị mặc định là "User")
       } catch (error) {
         console.error("Lỗi khi giải mã token:", error);
         setAvatar(defaultAvatar);
         setUserName("User"); // Tên mặc định nếu giải mã token thất bại
       }
-    } else {
-      setAvatar(defaultAvatar);
-      setUserName("User"); // Tên mặc định khi không đăng nhập
     }
   }, []);
 
@@ -116,8 +113,11 @@ export default function AppAppBar() {
   };
 
   const handleLogout = () => {
-    Cookies.remove("token"); // Remove token on logout
-    navigate("/sign-in"); // Navigate to login page
+    Cookies.remove("token");
+    setAvatar(""); // Reset avatar
+    setUserName(""); // Reset tên người dùng
+    setAnchorEl(null); // Đóng menu (nếu đang mở)
+    navigate("/dangnhap"); // Navigate to login page
   };
 
   return (
@@ -222,7 +222,7 @@ export default function AppAppBar() {
                       <ListItemText primary={`Xin chào, ${userName}`} />
                     </StyledMenuItem>
                     <Divider />
-                    <StyledMenuItem onClick={() => navigate("/manager/")}>
+                    <StyledMenuItem onClick={() => navigate("/quanly/")}>
                       <ListItemIcon>
                         <ListAltIcon fontSize="small" />
                       </ListItemIcon>
@@ -243,7 +243,7 @@ export default function AppAppBar() {
                   color="primary"
                   variant="text"
                   size="small"
-                  onClick={() => navigate("/sign-in")}
+                  onClick={() => navigate("/dangnhap")}
                 >
                   Đăng nhập
                 </Button>
@@ -251,7 +251,7 @@ export default function AppAppBar() {
                   color="primary"
                   variant="contained"
                   size="small"
-                  onClick={() => navigate("/sign-up")}
+                  onClick={() => navigate("/dangky")}
                 >
                   Đăng ký
                 </Button>

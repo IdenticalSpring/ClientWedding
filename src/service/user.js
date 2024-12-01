@@ -66,18 +66,46 @@ export const userAPI = {
       throw error;
     }
   },
-  getGuestList: async (limit = 10, page = 1) => {
+  getGuestList: async (limit = 20, page = 1, weddingId = "") => {
     try {
       const response = await requestNoTK.get(`/guest-list`, {
         params: {
           limit,
           page,
+          weddingId, // Thêm tham số weddingId vào yêu cầu
         },
       });
       return response.data;
     } catch (error) {
       console.error(
         "Error fetching guest list:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+
+  addGuest: async (guestData) => {
+    try {
+      const response = await requestNoTK.post(`/guest-list`, guestData);
+      console.log("Guest added successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error adding guest:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+  getAllWedding: async (guestData) => {
+    try {
+      const response = await requestNoTK.get(`/wedding-details`, guestData);
+      console.log("Get All wedding:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error adding guest:",
         error.response?.data || error.message
       );
       throw error;

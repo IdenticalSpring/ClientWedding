@@ -43,7 +43,11 @@ function App() {
           element={
             <PrivateRoute
               isAuthenticated={isAuthenticated}
-              element={<GuestList />}
+              element={
+                <DashboardLayout>
+                  <GuestList />
+                </DashboardLayout>
+              }
             />
           }
         />

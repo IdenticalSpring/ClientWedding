@@ -1,22 +1,52 @@
-import "./App.css";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignUp from "./sign-up/SignUp";
 import SignIn from "./sign-in/SignIn";
 import LandingPage from "./landing-page/LandingPage";
-import DashboardLayoutBasic from "./manager/Manager";
-import GuestList from "./manager/Guest-list";
+import DashboardLayout from "./dashboard/Dashboard";
+import GuestList from "./dashboard/Clients";
+import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
 
 function App() {
+  // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Kiểm tra nếu có token trong sessionStorage thì cho phép đăng nhập
+    const token = sessionStorage.getItem("access_token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>
-        {/* Định nghĩa các route */}
+        {/* Các route không cần bảo vệ */}
         <Route path="*" element={<LandingPage />} />
-        <Route path="/MarketingPage/" element={<LandingPage />} />
-        <Route path="/sign-in/" element={<SignIn />} />
-        <Route path="/sign-up/" element={<SignUp />} />
-        <Route path="/manager/" element={<DashboardLayoutBasic />} />
-        <Route path="/guest-list/" element={<GuestList />} />
+        <Route path="/TrangChu/" element={<LandingPage />} />
+        <Route path="/dangnhap/" element={<SignIn />} />
+        <Route path="/dangky/" element={<SignUp />} />
+
+        {/* Các route cần bảo vệ với PrivateRoute */}
+        <Route
+          path="/quanly/"
+          element={
+            <PrivateRoute
+              isAuthenticated={isAuthenticated}
+              element={<DashboardLayout />}
+            />
+          }
+        />
+        <Route
+          path="/quanlykhachmoi/"
+          element={
+            <PrivateRoute
+              isAuthenticated={isAuthenticated}
+              element={<GuestList />}
+            />
+          }
+        />
       </Routes>
     </Router>
   );

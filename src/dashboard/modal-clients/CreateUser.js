@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -8,319 +8,212 @@ import {
   Button,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
   Grid,
   FormLabel,
-  Checkbox,
-  FormControlLabel,
-} from '@mui/material';
-import { AdminAPI } from '../../../service/admin';
+} from "@mui/material";
+import { userAPI } from "../../service/user";
 
-const ModalAddUser = ({ open, onClose, fetchUsers }) => {
+const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    isActive: false,
-    dateOfBirth: '',
-    role: '',
-    avatar: '',
+    weddingId: "",
+    name: "",
+    email: "",
+    phone: "",
+    relationship: "",
+    status: "Invited",
+    note: "",
+    tableNumber: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [weddings, setWeddings] = useState([]); // State để lưu danh sách đám cưới
+
+  // Lấy danh sách đám cưới từ API
+  useEffect(() => {
+    const fetchWeddings = async () => {
+      try {
+        const response = await userAPI.getAllWedding(); // Gọi API để lấy danh sách weddings
+        setWeddings(response.data); // Lưu danh sách weddings vào state
+      } catch (error) {
+        console.error("Error fetching weddings:", error);
+      }
+    };
+
+    fetchWeddings();
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (name === 'avatar') {
-      setFormData((prev) => ({
-        ...prev,
-        avatar: files[0],
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleCheckboxChange = (e) => {
-    const { name, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: checked,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async () => {
-    const { name, email, password, avatar } = formData;
-    if (!name || !email || !password) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc.');
+    const {
+      weddingId,
+      name,
+      email,
+      phone,
+      relationship,
+      status,
+      note,
+      tableNumber,
+    } = formData;
+
+    // Validate required fields
+    if (!weddingId || !name || !email || !phone) {
+      alert("Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', formData?.name);
-    formDataToSend.append('email', formData?.email);
-    formDataToSend.append('password', formData.password);
-    formDataToSend.append('phone', formData.phone);
-    formDataToSend.append('isActive', formData.isActive);
-    formDataToSend.append('dateOfBirth', formData.dateOfBirth);
-    formDataToSend.append('role', formData.role);
-
-    if (avatar) {
-      formDataToSend.append('avatar', avatar);
-    }
-
     try {
-      const response = await AdminAPI.postUser(formData);
+      // Call API to add guest
+      const response = await userAPI.addGuest(formData);
       if (response?.status === 201 || response?.status === 200) {
-        console.log('done');
         onClose();
-        fetchUsers();
+        fetchGuests(); // Refresh danh sách khách mời sau khi thêm
         setFormData({
-          name: '',
-          email: '',
-          password: '',
-          phone: '',
-          isActive: false,
-          dateOfBirth: '',
-          role: '',
-          avatar: '',
+          weddingId: "",
+          name: "",
+          email: "",
+          phone: "",
+          relationship: "",
+          status: "Invited",
+          note: "",
+          tableNumber: "",
         });
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error adding guest:", error);
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Thêm người dùng</DialogTitle>
-      <DialogContent sx={{ overflowX: 'hidden' }}>
+      <DialogTitle>Thêm khách mời</DialogTitle>
+      <DialogContent>
         <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <FormLabel>Đám cưới</FormLabel>
+              <Select
+                name="weddingId"
+                value={formData.weddingId}
+                onChange={handleChange}
+                displayEmpty
+                fullWidth
+              >
+                <MenuItem value="" disabled>
+                  Chọn cô dâu & chú rể
+                </MenuItem>
+                {weddings.map((wedding) => (
+                  <MenuItem key={wedding.id} value={wedding.id}>
+                    {wedding.brideName} & {wedding.groomName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <FormLabel>Họ và Tên</FormLabel>
               <TextField
-                name='name'
+                name="name"
                 value={formData.name}
                 onChange={handleChange}
-                error={!!errors.name}
-                helperText={errors.name || ''}
-                placeholder='Nguyễn Văn A'
+                placeholder="Nguyễn Văn A"
                 fullWidth
                 required
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
               />
             </FormControl>
           </Grid>
-
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <FormLabel>Email</FormLabel>
               <TextField
-                name='email'
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
-                error={!!errors.email}
-                helperText={errors.email || ''}
-                placeholder='tu123@email.com'
+                placeholder="tu123@email.com"
                 fullWidth
                 required
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
               />
             </FormControl>
           </Grid>
-
-          <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormLabel>Password</FormLabel>
-              <TextField
-                type='password'
-                name='password'
-                value={formData.password}
-                onChange={handleChange}
-                error={!!errors.password}
-                helperText={errors.password || ''}
-                placeholder='********'
-                fullWidth
-                required
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-              />
-            </FormControl>
-          </Grid>
-
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <FormLabel>Số điện thoại</FormLabel>
               <TextField
-                name='phone'
+                name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                error={!!errors.phone}
-                helperText={errors.phone || ''}
-                placeholder='0123456789'
+                placeholder="0123456789"
                 fullWidth
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
+                required
               />
             </FormControl>
           </Grid>
-          {/* 
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name='isActive'
-                    checked={formData.isActive}
-                    onChange={handleCheckboxChange}
-                  />
-                }
-                label='Hoạt động'
-              />
-            </FormControl>
-          </Grid> */}
-
-          <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormLabel>Ngày sinh</FormLabel>
+              <FormLabel>Mối quan hệ</FormLabel>
               <TextField
-                type='date'
-                name='dateOfBirth'
-                value={formData.dateOfBirth}
+                name="relationship"
+                value={formData.relationship}
                 onChange={handleChange}
-                error={!!errors.dateOfBirth}
-                helperText={errors.dateOfBirth || ''}
+                placeholder="Bạn bè, gia đình, đồng nghiệp..."
                 fullWidth
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
               />
             </FormControl>
           </Grid>
-
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormLabel>Vai trò</FormLabel>
+              <FormLabel>Trạng thái</FormLabel>
               <Select
-                label='Vai trò'
-                name='role'
-                value={formData.role}
+                name="status"
+                value={formData.status}
                 onChange={handleChange}
                 fullWidth
-                sx={{
-                  '& .MuiSelect-select': {
-                    textAlign: 'center',
-                  },
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
               >
-                <MenuItem value='admin'>Admin</MenuItem>
-                <MenuItem value='user'>User</MenuItem>
-                <MenuItem value='moderator'>Moderator</MenuItem>
+                <MenuItem value="Invited">Invited</MenuItem>
+                <MenuItem value="Accepted">Accepted</MenuItem>
+                <MenuItem value="Declined">Declined</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-
           <Grid item xs={12}>
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormLabel>Avatar</FormLabel>
+              <FormLabel>Ghi chú</FormLabel>
               <TextField
-                type='file'
-                name='avatar'
+                name="note"
+                value={formData.note}
                 onChange={handleChange}
+                placeholder="Ghi chú thêm (nếu có)"
                 fullWidth
-                InputProps={{
-                  sx: {
-                    textAlign: 'center',
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    border: 'none',
-                    outline: 'none',
-                  },
-                }}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <FormLabel>Số bàn</FormLabel>
+              <TextField
+                type="number"
+                name="tableNumber"
+                value={formData.tableNumber}
+                onChange={handleChange}
+                placeholder="Số bàn của khách mời"
+                fullWidth
               />
             </FormControl>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color='primary'>
+        <Button onClick={onClose} color="primary">
           Hủy
         </Button>
-        <Button onClick={handleSubmit} color='secondary'>
+        <Button onClick={handleSubmit} color="secondary">
           Lưu
         </Button>
       </DialogActions>
@@ -328,4 +221,4 @@ const ModalAddUser = ({ open, onClose, fetchUsers }) => {
   );
 };
 
-export default ModalAddUser;
+export default ModalAddGuest;

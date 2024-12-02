@@ -88,7 +88,6 @@ export const userAPI = {
   addGuest: async (guestData) => {
     try {
       const response = await requestNoTK.post(`/guest-list`, guestData);
-      console.log("Guest added successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error(
@@ -101,13 +100,49 @@ export const userAPI = {
   getAllWedding: async (guestData) => {
     try {
       const response = await requestNoTK.get(`/wedding-details`, guestData);
-      console.log("Get All wedding:", response.data);
       return response.data;
     } catch (error) {
       console.error(
         "Error adding guest:",
         error.response?.data || error.message
       );
+      throw error;
+    }
+  },
+
+  addEvents: async (eventData) => {
+    try {
+      const response = await requestNoTK.post(`/event-details`, eventData);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error adding events:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+  getAllEvents: async (eventData) => {
+    try {
+      const response = await requestNoTK.get(`/event-details`, eventData);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error adding Event:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+
+  getEventsByWeddingId: async (weddingId) => {
+    try {
+      const response = await requestNoTK.get(
+        `/event-details/wedding/${weddingId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching events by weddingId:", error);
       throw error;
     }
   },

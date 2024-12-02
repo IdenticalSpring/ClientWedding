@@ -6,6 +6,8 @@ import LandingPage from "./landing-page/LandingPage";
 import DashboardLayout from "./dashboard/Dashboard";
 import GuestList from "./dashboard/Clients";
 import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
+import Event from "./dashboard/Event";
+import Calendar from "./dashboard/modal-event/Calendar";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -46,6 +48,20 @@ function App() {
               element={
                 <DashboardLayout>
                   <GuestList />
+                </DashboardLayout>
+              }
+            />
+          }
+        />
+        <Route
+          path="/quanlydamcuoi/"
+          element={
+            <PrivateRoute
+              isAuthenticated={isAuthenticated}
+              element={
+                <DashboardLayout>
+                  <Calendar />
+                  <Event />
                 </DashboardLayout>
               }
             />

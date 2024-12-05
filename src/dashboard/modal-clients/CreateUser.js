@@ -210,7 +210,19 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button
+          onClick={onClose}
+          sx={{
+            minWidth: "fit-content",
+            backgroundColor: "hsl(345, 75%, 42%)",
+            color: "hsl(5, 90%, 95%)",
+            "&:hover": {
+              backgroundColor: "hsl(340, 80%, 38%)",
+              opacity: 0.8,
+            },
+            alignSelf: "center",
+          }}
+        >
           Hủy
         </Button>
         <Button onClick={handleSubmit} color="secondary">

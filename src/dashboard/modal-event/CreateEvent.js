@@ -174,13 +174,17 @@ const AddEventModal = ({ onAddEvent }) => {
         />
 
         <Button
-          variant="contained"
+          variant="text-container"
           fullWidth
           sx={{
-            backgroundColor: "#D32F2F", // Đỏ đậm
+            minWidth: "fit-content",
+            backgroundColor: "hsl(345, 75%, 42%)",
+            color: "hsl(5, 90%, 95%)",
             "&:hover": {
-              backgroundColor: "#B71C1C", // Đỏ tối hơn khi hover
+              backgroundColor: "hsl(340, 80%, 38%)",
+              opacity: 0.8,
             },
+            alignSelf: "center",
           }}
         >
           Thêm sự kiện

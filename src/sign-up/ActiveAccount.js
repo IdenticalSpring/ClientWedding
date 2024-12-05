@@ -113,11 +113,16 @@ export default function ActivateAccountPage() {
           <Button
             onClick={handleActivate}
             color="primary"
-            variant="contained"
+            variant="text-container"
             sx={{
-              fontWeight: "bold",
-              padding: "8px 20px",
-              textTransform: "none",
+              minWidth: "fit-content",
+              backgroundColor: "hsl(345, 75%, 42%)",
+              color: "hsl(5, 90%, 95%)",
+              "&:hover": {
+                backgroundColor: "hsl(340, 80%, 38%)",
+                opacity: 0.8,
+              },
+              alignSelf: "center",
             }}
             disabled={loading} // Vô hiệu hóa nút khi đang load
           >

@@ -90,10 +90,10 @@ const Clients = () => {
 
   const columns = [
     { field: "name", headerName: "Tên khách mời", flex: 1 },
-    { field: "phone", headerName: "Số điện thoại", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
     { field: "relationship", headerName: "Mối quan hệ", flex: 1 },
     { field: "status", headerName: "Trạng thái", flex: 1 },
-    { field: "tableNumber", headerName: "Số bàn", flex: 1 },
+
     {
       field: "actions",
       headerName: "Hành động",
@@ -152,7 +152,17 @@ const Clients = () => {
         }}
       >
         <Button
-          variant="contained"
+          variant="text-container"
+          sx={{
+            minWidth: "fit-content",
+            backgroundColor: "hsl(345, 75%, 42%)",
+            color: "hsl(5, 90%, 95%)",
+            "&:hover": {
+              backgroundColor: "hsl(340, 80%, 38%)",
+              opacity: 0.8,
+            },
+            alignSelf: "center",
+          }}
           startIcon={<AddIcon />}
           onClick={() => setOpenAddModal(true)}
         >

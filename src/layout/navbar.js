@@ -215,7 +215,7 @@ export default function AppAppBar() {
                   onClose={handleMenuClose}
                 >
                   <MenuList>
-                    <StyledMenuItem onClick={() => navigate("/profile")}>
+                    <StyledMenuItem onClick={() => navigate("/nguoidung")}>
                       <ListItemIcon>
                         <AccountCircleIcon fontSize="small" />
                       </ListItemIcon>
@@ -232,7 +232,7 @@ export default function AppAppBar() {
                       <ListItemIcon>
                         <ExitToAppIcon fontSize="small" />
                       </ListItemIcon>
-                      <ListItemText primary="Logout" />
+                      <ListItemText primary="Đăng xuất" />
                     </StyledMenuItem>
                   </MenuList>
                 </StyledMenu>

@@ -236,7 +236,7 @@ export default function SignIn(props) {
             <Typography sx={{ textAlign: "center" }}>
               Bạn chưa có tài khoản?{" "}
               <Link
-                href="/sign-up/"
+                href="/dangky/"
                 variant="body2"
                 sx={{ alignSelf: "center" }}
               >

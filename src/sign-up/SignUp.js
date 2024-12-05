@@ -1,10 +1,8 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-// import Checkbox from "@mui/material/Checkbox";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
-// import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import Link from "@mui/material/Link";
@@ -17,7 +15,7 @@ import AppTheme from "../components/shared-theme/AppTheme";
 import { GoogleIcon, FacebookIcon } from "./CustomeIcons";
 import ColorModeSelect from "../components/shared-theme/ColorModeSelect";
 import { registerUser } from "../service/auth";
-import ActivateAccountDialog from "./ActiveAccount"; // Import the dialog
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -68,8 +66,7 @@ export default function SignUp(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState("");
-
-  const [dialogOpen, setDialogOpen] = React.useState(false); // Manage dialog state
+  const navigate = useNavigate();
 
   const validateInputs = () => {
     const email = document.getElementById("email");
@@ -126,7 +123,9 @@ export default function SignUp(props) {
     const response = await registerUser(userPayload);
 
     if (response.success) {
-      setDialogOpen(true); // Open the dialog
+      // No dialog, continue with next steps
+      alert("Đăng ký thành công");
+      navigate("/kichhoattaikhoan");
     }
   };
 
@@ -193,10 +192,6 @@ export default function SignUp(props) {
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
-            {/* <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            /> */}
             <Button
               type="submit"
               fullWidth
@@ -239,10 +234,6 @@ export default function SignUp(props) {
           </Box>
         </Card>
       </SignUpContainer>
-      <ActivateAccountDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-      />
     </AppTheme>
   );
 }

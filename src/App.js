@@ -8,6 +8,8 @@ import GuestList from "./dashboard/Clients";
 import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
 import Event from "./dashboard/Event";
 import Calendar from "./dashboard/modal-event/Calendar";
+import Profile from "./user/profile";
+import ActivateAccountPage from "./sign-up/ActiveAccount";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -29,7 +31,7 @@ function App() {
         <Route path="/TrangChu/" element={<LandingPage />} />
         <Route path="/dangnhap/" element={<SignIn />} />
         <Route path="/dangky/" element={<SignUp />} />
-
+        <Route path="/kichhoattaikhoan/" element={<ActivateAccountPage />} />
         {/* Các route cần bảo vệ với PrivateRoute */}
         <Route
           path="/quanly/"
@@ -64,6 +66,15 @@ function App() {
                   <Event />
                 </DashboardLayout>
               }
+            />
+          }
+        />
+        <Route
+          path="/nguoidung/"
+          element={
+            <PrivateRoute
+              isAuthenticated={isAuthenticated}
+              element={<Profile />}
             />
           }
         />

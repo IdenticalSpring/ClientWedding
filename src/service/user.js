@@ -146,4 +146,16 @@ export const userAPI = {
       throw error;
     }
   },
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await requestNoTK.put(`/users/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error updating user information:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
 };

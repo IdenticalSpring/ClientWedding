@@ -32,6 +32,7 @@ function App() {
         <Route path="/dangnhap/" element={<SignIn />} />
         <Route path="/dangky/" element={<SignUp />} />
         <Route path="/kichhoattaikhoan/" element={<ActivateAccountPage />} />
+
         {/* Các route cần bảo vệ với PrivateRoute */}
         <Route
           path="/quanly/"
@@ -74,7 +75,11 @@ function App() {
           element={
             <PrivateRoute
               isAuthenticated={isAuthenticated}
-              element={<Profile />}
+              element={
+                <DashboardLayout>
+                  <Profile />
+                </DashboardLayout>
+              }
             />
           }
         />

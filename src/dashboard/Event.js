@@ -169,15 +169,17 @@ const EventListModal = () => {
         </List>
 
         <Button
-          variant="contained"
+          variant="text-container"
           fullWidth
           sx={{
-            mt: 2,
-            backgroundColor: "#F06292", // Nút màu hồng
-            color: "#FFFFFF",
+            minWidth: "fit-content",
+            backgroundColor: "hsl(345, 75%, 42%)",
+            color: "hsl(5, 90%, 95%)",
             "&:hover": {
-              backgroundColor: "#AD1457", // Màu khi hover
+              backgroundColor: "hsl(340, 80%, 38%)",
+              opacity: 0.8,
             },
+            alignSelf: "center",
           }}
           onClick={handleOpenAddModal}
         >

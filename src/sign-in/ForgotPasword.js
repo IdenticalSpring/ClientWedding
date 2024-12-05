@@ -86,7 +86,17 @@ function ForgotPassword({ open, handleClose }) {
         <DialogActions>
           <Button onClick={handleClose}>Hủy</Button>
           <Button
-            variant="contained"
+            variant="text-container"
+            sx={{
+              minWidth: "fit-content",
+              backgroundColor: "hsl(345, 75%, 42%)",
+              color: "hsl(5, 90%, 95%)",
+              "&:hover": {
+                backgroundColor: "hsl(340, 80%, 38%)",
+                opacity: 0.8,
+              },
+              alignSelf: "center",
+            }}
             type="submit"
             onClick={handleSubmit}
             disabled={loading || !email} // Disable khi đang loading hoặc email trống

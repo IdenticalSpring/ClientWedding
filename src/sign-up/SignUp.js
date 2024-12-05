@@ -195,7 +195,17 @@ export default function SignUp(props) {
             <Button
               type="submit"
               fullWidth
-              variant="contained"
+              variant="text-container"
+              sx={{
+                minWidth: "fit-content",
+                backgroundColor: "hsl(345, 75%, 42%)",
+                color: "hsl(5, 90%, 95%)",
+                "&:hover": {
+                  backgroundColor: "hsl(340, 80%, 38%)",
+                  opacity: 0.8,
+                },
+                alignSelf: "center",
+              }}
               onClick={validateInputs}
             >
               Đăng ký

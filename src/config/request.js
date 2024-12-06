@@ -1,12 +1,13 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import QueryString from "qs";
-// const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseURL = process.env.REACT_APP_API_BASE_URL;
+console.log('Base URL:', process.env.REACT_APP_API_BASE_URL);
 export const request = axios.create({
   headers: {
     "Content-Type": "application/json;charset=UTF-8",
   },
-  baseURL: `http://localhost:8080/api/v1`,
+  baseURL: `${baseURL}`,
   timeout: 50000,
 });
 

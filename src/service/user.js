@@ -159,7 +159,7 @@ export const userAPI = {
       throw error;
     }
   },
-  getAllTemplates: async (page = 1, limit = 12) => {
+  getAllTemplates: async (page , limit ) => {
     try {
       const response = await request.get(`/templates`, {
         params: { page, limit },

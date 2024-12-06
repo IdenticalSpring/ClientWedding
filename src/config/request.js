@@ -18,7 +18,7 @@ request.defaults.paramsSerializer = {
 
 request.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("token");
+    const token = sessionStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {

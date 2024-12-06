@@ -28,14 +28,14 @@ const EventListModal = () => {
 
   useEffect(() => {
     if (selectedWedding) {
-      fetchEventsByWedding(selectedWedding); // Lọc sự kiện theo đám cưới đã chọn
+      fetchEventsByWedding(selectedWedding); 
     }
   }, [selectedWedding]);
 
   // Lấy danh sách đám cưới
   const fetchWeddings = async () => {
     try {
-      const response = await userAPI.getAllWedding(); // Giả sử có API này
+      const response = await userAPI.getAllWedding(); 
       setWeddingList(response.data);
     } catch (error) {
       console.error("Error fetching weddings:", error);

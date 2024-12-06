@@ -1,6 +1,7 @@
 import axios from "axios";
 // import request from "../config/request";
 import { requestNoTK } from "../config/requestNoTK";
+import { request } from "../config/request";
 
 const baseURL = "http://localhost:8080/api/v1";
 
@@ -158,4 +159,16 @@ export const userAPI = {
       throw error;
     }
   },
+  getAllTemplates: async (page = 1, limit = 12) => {
+    try {
+      const response = await request.get(`/templates`, {
+        params: { page, limit },
+      });
+      return response.data; 
+    } catch (error) {
+      console.error("Error fetching templates:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
 };

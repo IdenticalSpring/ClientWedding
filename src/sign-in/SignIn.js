@@ -17,7 +17,7 @@ import ForgotPassword from "./ForgotPasword";
 import { GoogleIcon, FacebookIcon } from "./CustomIcons";
 import AppTheme from "../components/shared-theme/AppTheme";
 import ColorModeSelect from "../components/shared-theme/ColorModeSelect";
-import { loginUser } from "../service/auth"; // Cập nhật đường dẫn tùy theo cấu trúc thư mục của bạn
+import { loginUser } from "../service/auth"; 
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -95,9 +95,9 @@ export default function SignIn(props) {
       const result = await loginUser(payload);
 
       if (result.success) {
-        const token = result.data.access_token; // Lấy access_token từ API
-        sessionStorage.setItem("access_token", token); // Lưu access_token vào sessionStorage
-        window.location.href = "/"; // Chuyển hướng đến trang chính
+        const token = result.data.access_token; 
+        sessionStorage.setItem("access_token", token); 
+        window.location.href = "/"; 
       }
     } catch (error) {
       console.error("Login failed:", error);

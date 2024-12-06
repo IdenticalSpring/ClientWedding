@@ -1,11 +1,11 @@
 import axios from "axios";
 import QueryString from "qs";
-
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 export const requestNoTK = axios.create({
   headers: {
     "Content-Type": "application/json;charset=UTF-8",
   },
-  baseURL: `http://localhost:8080/api/v1`,
+  baseURL: `${baseURL}`,
   timeout: 50000,
 });
 

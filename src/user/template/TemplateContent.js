@@ -1,37 +1,158 @@
 import React, { useEffect, useState } from "react";
-import { userAPI } from "../../service/user"; // Đảm bảo đúng đường dẫn
-import { Box, Typography, Paper, CircularProgress, Button, Pagination } from "@mui/material";
+import { userAPI } from "../../service/user";
+import { Box, Typography, CircularProgress, Button, Pagination } from "@mui/material";
+import { Star } from '@mui/icons-material';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate from React Router
+
+// Styled Components
+const Wrapper = styled.div`
+  padding: 20px;
+  background-color: #f5f5f5;
+`;
+
+const TemplateContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: stretch;
+`;
+
+const TemplateCard = styled.div`
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  position: relative;
+  transition: all 0.3s ease;
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+  }
+`;
+
+const VIPIndicator = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #ffd700;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+`;
+
+const FreeIndicator = styled.div`
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background-color: #ff4d4d;
+  color: #fff;
+  padding: 5px 50px;
+  transform: rotate(45deg);
+  z-index: 10;
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+`;
+
+const TemplateImage = styled.img`
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+`;
+
+const TemplateDetails = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+`;
+
+const TemplateName = styled(Typography)`
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #1976d2; /* Màu xanh dương */
+`;
+
+const TemplateDescription = styled(Typography)`
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+`;
+
+const ButtonContainer = styled(Box)`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+const AddButton = styled(Button)`
+  text-transform: none;
+  background-color: #4caf50; /* Màu xanh lá */
+  margin-right: 10px;
+  &:hover {
+    background-color: #45a049;
+    opacity: 0.8;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  text-transform: none;
+  background-color: hsl(345, 75%, 42%);
+  &:hover {
+    background-color: hsl(340, 80%, 38%);
+    opacity: 0.8;
+  }
+`;
 
 const TemplateContent = () => {
-    const [templates, setTemplates] = useState([]); // Khởi tạo với mảng trống
+    const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1); // Số trang hiện tại
-    const [totalPages, setTotalPages] = useState(1); // Tổng số trang
-    const [limit] = useState(20); // Số lượng item mỗi trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit] = useState(20);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
                 const response = await userAPI.getAllTemplates(currentPage, limit);
-                console.log("Fetched templates:", response.data.data); // Log templates
-                setTemplates(response.data.data || []); // Gán templates từ API
-
-                // Tính toán tổng số trang từ thông tin API trả về
-                setTotalPages(Math.ceil(response.data.total / limit)); // Tổng số trang = tổng mẫu / limit
+                setTemplates(response.data.data || []);
+                setTotalPages(Math.ceil(response.data.total / limit));
             } catch (error) {
                 console.error("Error fetching templates:", error);
-                setTemplates([]); // Gán mảng trống nếu có lỗi
+                setTemplates([]);
             } finally {
-                setLoading(false); // Kết thúc trạng thái loading
+                setLoading(false);
             }
         };
 
         fetchTemplates();
-    }, [currentPage, limit]); // Khi currentPage hoặc limit thay đổi sẽ gọi lại API
+    }, [currentPage, limit]);
 
     const handlePageChange = (event, value) => {
-        setCurrentPage(value); // Cập nhật trang khi người dùng chọn
-        setLoading(true); // Đặt lại trạng thái loading khi thay đổi trang
+        setCurrentPage(value);
+        setLoading(true);
+    };
+
+    const handlePreview = (templateId) => {
+        navigate(`/template/${templateId}`); 
+    };
+
+    const handleTryNow = (templateId) => {
+        navigate(`/template/${templateId}`); 
     };
 
     if (loading) {
@@ -53,81 +174,53 @@ const TemplateContent = () => {
     }
 
     return (
-        <Box sx={{ padding: "20px" }}>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
+        <Wrapper>
+            <TemplateContainer>
                 {templates.map((template) => (
-                    <Paper
-                        key={template.id}
-                        sx={{
-                            width: "300px",
-                            height: "auto",
-                            border: "1px solid #ccc",
-                            borderRadius: "12px",
-                            overflow: "hidden",
-                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                            backgroundColor: "#fff",
-                            transition: "all 0.3s ease",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            textAlign: "center",
-                            "&:hover": {
-                                boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                                transform: "scale(1.05)",
-                            },
-                        }}
-                    >
-                        <img
-                            src={template.thumbnailUrl}
-                            alt={template.name}
-                            style={{
-                                width: "100%",
-                                height: "200px",
-                                objectFit: "cover",
-                            }}
-                        />
-                        <Box sx={{ padding: "15px" }}>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    fontSize: "1.2rem",
-                                    marginBottom: "10px",
-                                    fontWeight: "600",
-                                    color: "primary.main",
-                                }}
-                            >
-                                {template.name}
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{ color: "#666", fontSize: "0.9rem", marginBottom: "10px" }}
-                            >
-                                {template.description}
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{ color: "#444", fontSize: "0.9rem", marginBottom: "15px" }}
-                            >
-                                <strong>Giao diện:</strong> {template.accessType}
-                            </Typography>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                    textTransform: "none",
-                                    backgroundColor: "hsl(345, 75%, 42%)",
-                                    "&:hover": {
-                                        backgroundColor: "hsl(340, 80%, 38%)",
-                                        opacity: 0.8,
-                                    },
-                                }}
-                            >
-                                Thử ngay
-                            </Button>
-                        </Box>
-                    </Paper>
+                    <TemplateCard key={template.id}>
+                        {template.accessType === "VIP" && (
+                            <VIPIndicator>
+                                <Star sx={{ marginRight: "5px", fontSize: "20px" }} />
+                                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                                    VIP
+                                </Typography>
+                            </VIPIndicator>
+                        )}
+
+                        {template.accessType === "FREE" && (
+                            <FreeIndicator>FREE</FreeIndicator>
+                        )}
+
+                        <TemplateImage src={template.thumbnailUrl} alt={template.name} />
+
+                        <TemplateDetails>
+                            <Box>
+                                <TemplateName variant="h6">{template.name}</TemplateName>
+                                <TemplateDescription variant="body2">
+                                    {template.description}
+                                </TemplateDescription>
+                            </Box>
+
+                            <ButtonContainer>
+                                <AddButton
+                                    variant="contained"
+                                    onClick={() => handlePreview(template.id)} 
+                                >
+                                    Xem trước
+                                </AddButton>
+                                <StyledButton
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleTryNow(template.id)} 
+                                >
+                                    Thử ngay
+                                </StyledButton>
+                            </ButtonContainer>
+                        </TemplateDetails>
+                    </TemplateCard>
                 ))}
-            </Box>
+            </TemplateContainer>
+
             <Box sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
                 <Pagination
                     count={totalPages}
@@ -138,7 +231,7 @@ const TemplateContent = () => {
                     shape="rounded"
                 />
             </Box>
-        </Box>
+        </Wrapper>
     );
 };
 

@@ -3,6 +3,7 @@ import { userAPI } from "../../service/user";
 import { Box, Typography, CircularProgress, Button, Pagination } from "@mui/material";
 import { Star } from '@mui/icons-material';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate from React Router
 
 // Styled Components
 const Wrapper = styled.div`
@@ -90,10 +91,21 @@ const TemplateDescription = styled(Typography)`
   margin-bottom: 10px;
 `;
 
-const TemplateAccessType = styled(Typography)`
-  color: #444;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
+const ButtonContainer = styled(Box)`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+const AddButton = styled(Button)`
+  text-transform: none;
+  background-color: #4caf50; /* Màu xanh lá */
+  margin-right: 10px;
+  &:hover {
+    background-color: #45a049;
+    opacity: 0.8;
+  }
 `;
 
 const StyledButton = styled(Button)`
@@ -105,35 +117,18 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const AddButton = styled(Button)`
-  text-transform: none;
-  background-color: #4caf50; /* Màu xanh lá */
-  margin-right: 10px; /* Cách nhau 10px */
-  &:hover {
-    background-color: #45a049;
-    opacity: 0.8;
-  }
-`;
-
-const ButtonContainer = styled(Box)`
-  display: flex;
-  gap: 10px; /* Khoảng cách giữa hai nút */
-  justify-content: center;
-  margin-top: 10px;
-`;
-
 const TemplateContent = () => {
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [limit] = useState(20);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
                 const response = await userAPI.getAllTemplates(currentPage, limit);
-                console.log("Fetched templates:", response.data.data);
                 setTemplates(response.data.data || []);
                 setTotalPages(Math.ceil(response.data.total / limit));
             } catch (error) {
@@ -150,6 +145,14 @@ const TemplateContent = () => {
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
         setLoading(true);
+    };
+
+    const handlePreview = (templateId) => {
+        navigate(`/template/${templateId}`); 
+    };
+
+    const handleTryNow = (templateId) => {
+        navigate(`/template/${templateId}`); 
     };
 
     if (loading) {
@@ -175,7 +178,6 @@ const TemplateContent = () => {
             <TemplateContainer>
                 {templates.map((template) => (
                     <TemplateCard key={template.id}>
-                        {/* VIP Indicator */}
                         {template.accessType === "VIP" && (
                             <VIPIndicator>
                                 <Star sx={{ marginRight: "5px", fontSize: "20px" }} />
@@ -185,17 +187,12 @@ const TemplateContent = () => {
                             </VIPIndicator>
                         )}
 
-                        {/* Free Indicator */}
                         {template.accessType === "FREE" && (
-                            <FreeIndicator>
-                                FREE
-                            </FreeIndicator>
+                            <FreeIndicator>FREE</FreeIndicator>
                         )}
 
-                        {/* Template Image */}
                         <TemplateImage src={template.thumbnailUrl} alt={template.name} />
 
-                        {/* Template Details */}
                         <TemplateDetails>
                             <Box>
                                 <TemplateName variant="h6">{template.name}</TemplateName>
@@ -204,12 +201,18 @@ const TemplateContent = () => {
                                 </TemplateDescription>
                             </Box>
 
-                            {/* Nút Thêm và Thử ngay */}
                             <ButtonContainer>
-                                <AddButton variant="contained">
+                                <AddButton
+                                    variant="contained"
+                                    onClick={() => handlePreview(template.id)} 
+                                >
                                     Xem trước
                                 </AddButton>
-                                <StyledButton variant="contained" color="primary">
+                                <StyledButton
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleTryNow(template.id)} 
+                                >
                                     Thử ngay
                                 </StyledButton>
                             </ButtonContainer>
@@ -218,7 +221,6 @@ const TemplateContent = () => {
                 ))}
             </TemplateContainer>
 
-            {/* Pagination */}
             <Box sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
                 <Pagination
                     count={totalPages}

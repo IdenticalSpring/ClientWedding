@@ -11,6 +11,7 @@ import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
 import ActivateAccountPage from "./sign-up/ActiveAccount";
 import TemplatePage from "./user/template/TemplatePage"; 
+import TemplateDetail from "./user/template/TemplateDetail";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -87,6 +88,7 @@ function App() {
 
         {/* New Template Page Route */}
         <Route path="/template/" element={<TemplatePage />} />
+        <Route path="/template/:id" element={<TemplateDetail />} />
       </Routes>
     </Router>
   );

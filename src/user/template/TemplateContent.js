@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { userAPI } from "../../service/user";
-import { Box, Typography, CircularProgress, Button, Pagination } from "@mui/material";
-import { Star } from '@mui/icons-material';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate from React Router
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+  Pagination,
+} from "@mui/material";
+import { Star } from "@mui/icons-material";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
 
 // Styled Components
 const Wrapper = styled.div`
@@ -61,7 +67,7 @@ const FreeIndicator = styled.div`
   font-weight: bold;
   text-align: center;
   font-size: 0.8rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const TemplateImage = styled.img`
@@ -118,121 +124,123 @@ const StyledButton = styled(Button)`
 `;
 
 const TemplateContent = () => {
-    const [templates, setTemplates] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [limit] = useState(20);
-    const navigate = useNavigate(); // Initialize useNavigate
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(20);
+  const navigate = useNavigate(); // Initialize useNavigate
 
-    useEffect(() => {
-        const fetchTemplates = async () => {
-            try {
-                const response = await userAPI.getAllTemplates(currentPage, limit);
-                setTemplates(response.data.data || []);
-                setTotalPages(Math.ceil(response.data.total / limit));
-            } catch (error) {
-                console.error("Error fetching templates:", error);
-                setTemplates([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTemplates();
-    }, [currentPage, limit]);
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        setLoading(true);
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await userAPI.getAllTemplates(currentPage, limit);
+        setTemplates(response.data.data || []);
+        setTotalPages(Math.ceil(response.data.total / limit));
+      } catch (error) {
+        console.error("Error fetching templates:", error);
+        setTemplates([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handlePreview = (templateId) => {
-        navigate(`/template/${templateId}`); 
-    };
+    fetchTemplates();
+  }, [currentPage, limit]);
 
-    const handleTryNow = (templateId) => {
-        navigate(`/template/${templateId}`); 
-    };
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+    setLoading(true);
+  };
 
-    if (loading) {
-        return (
-            <Box sx={{ display: "flex", justifyContent: "center", padding: "50px" }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
+  const handlePreview = (templateId) => {
+    navigate(`/template/${templateId}`);
+  };
 
-    if (!Array.isArray(templates) || templates.length === 0) {
-        return (
-            <Box sx={{ textAlign: "center", padding: "20px" }}>
-                <Typography variant="h6" color="text.secondary">
-                    Không có mẫu nào để hiển thị.
-                </Typography>
-            </Box>
-        );
-    }
+  const handleTryNow = (templateId) => {
+    navigate(`/template/${templateId}`);
+  };
 
+  if (loading) {
     return (
-        <Wrapper>
-            <TemplateContainer>
-                {templates.map((template) => (
-                    <TemplateCard key={template.id}>
-                        {template.accessType === "VIP" && (
-                            <VIPIndicator>
-                                <Star sx={{ marginRight: "5px", fontSize: "20px" }} />
-                                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                                    VIP
-                                </Typography>
-                            </VIPIndicator>
-                        )}
-
-                        {template.accessType === "FREE" && (
-                            <FreeIndicator>FREE</FreeIndicator>
-                        )}
-
-                        <TemplateImage src={template.thumbnailUrl} alt={template.name} />
-
-                        <TemplateDetails>
-                            <Box>
-                                <TemplateName variant="h6">{template.name}</TemplateName>
-                                <TemplateDescription variant="body2">
-                                    {template.description}
-                                </TemplateDescription>
-                            </Box>
-
-                            <ButtonContainer>
-                                <AddButton
-                                    variant="contained"
-                                    onClick={() => handlePreview(template.id)} 
-                                >
-                                    Xem trước
-                                </AddButton>
-                                <StyledButton
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleTryNow(template.id)} 
-                                >
-                                    Thử ngay
-                                </StyledButton>
-                            </ButtonContainer>
-                        </TemplateDetails>
-                    </TemplateCard>
-                ))}
-            </TemplateContainer>
-
-            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="primary"
-                    variant="outlined"
-                    shape="rounded"
-                />
-            </Box>
-        </Wrapper>
+      <Box sx={{ display: "flex", justifyContent: "center", padding: "50px" }}>
+        <CircularProgress />
+      </Box>
     );
+  }
+
+  if (!Array.isArray(templates) || templates.length === 0) {
+    return (
+      <Box sx={{ textAlign: "center", padding: "20px" }}>
+        <Typography variant="h6" color="text.secondary">
+          Không có mẫu nào để hiển thị.
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Wrapper>
+      <TemplateContainer>
+        {templates.map((template) => (
+          <TemplateCard key={template.id}>
+            {template.accessType === "VIP" && (
+              <VIPIndicator>
+                <Star sx={{ marginRight: "5px", fontSize: "20px" }} />
+                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                  VIP
+                </Typography>
+              </VIPIndicator>
+            )}
+
+            {template.accessType === "FREE" && (
+              <FreeIndicator>FREE</FreeIndicator>
+            )}
+
+            <TemplateImage src={template.thumbnailUrl} alt={template.name} />
+
+            <TemplateDetails>
+              <Box>
+                <TemplateName variant="h6">{template.name}</TemplateName>
+                <TemplateDescription variant="body2">
+                  {template.description}
+                </TemplateDescription>
+              </Box>
+
+              <ButtonContainer>
+                <AddButton
+                  variant="contained"
+                  onClick={() => handlePreview(template.id)}
+                >
+                  Xem trước
+                </AddButton>
+                <StyledButton
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleTryNow(template.id)}
+                >
+                  Thử ngay
+                </StyledButton>
+              </ButtonContainer>
+            </TemplateDetails>
+          </TemplateCard>
+        ))}
+      </TemplateContainer>
+
+      <Box
+        sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      >
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          variant="outlined"
+          shape="rounded"
+        />
+      </Box>
+    </Wrapper>
+  );
 };
 
 export default TemplateContent;

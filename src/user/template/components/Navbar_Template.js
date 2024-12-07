@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import ColorModeIconDropdown from "../components/shared-theme/ColorModeIconDropdown";
+import ColorModeIconDropdown from "../../../components/shared-theme/ColorModeIconDropdown";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -69,7 +69,7 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   },
 }));
 
-export default function AppAppBar() {
+export default function NavbarTemplate() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState(""); // State to hold avatar image
@@ -143,32 +143,9 @@ export default function AppAppBar() {
                 size="small"
                 onClick={() => navigate("/")}
               >
-                Xem hướng dẫn
+                Home
               </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                onClick={() => handleScrollToSection("logo-collection")}
-              >
-                Công cụ lập kế hoạch
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                onClick={() => handleScrollToSection("testimonials")}
-              >
-                Cặp đôi đã tạo
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                onClick={() => handleScrollToSection("highlights")}
-              >
-                Điểm nổi bật
-              </Button>
+
               <Button
                 variant="text"
                 color="info"
@@ -178,33 +155,13 @@ export default function AppAppBar() {
               >
                 Kho giao diện
               </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                sx={{ minWidth: 0 }}
-                onClick={() => handleScrollToSection("faq")}
-              >
-                Bảng giá
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                onClick={() => navigate("/blog")}
-                sx={{ minWidth: 0 }}
-              >
-                Blog
-              </Button>
             </Box>
           </Box>
-
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
               gap: 1,
               alignItems: "center",
-              paddingRight: 0,
             }}
           >
             {/* Conditionally render either avatar or login/signup buttons */}

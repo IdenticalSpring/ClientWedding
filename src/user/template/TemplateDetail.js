@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 const TemplateDetail = () => {
-    const { id } = useParams(); // Lấy id từ URL
+    const { id } = useParams(); 
 
     return (
         <div>

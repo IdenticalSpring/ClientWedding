@@ -1,34 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Box, Button, Grid } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTemplateById } from "../../service/templateService"; // Your service function
+import { getTemplateByUrl } from "../../service/templateService"; // Your service function
 
 const ViewTemplate = () => {
-  const { templateId } = useParams(); // Get templateId from URL
+  const { url } = useParams(); // Lấy tham số URL từ route
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Lấy template khi component được mount hoặc url thay đổi
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const response = await getTemplateById(templateId);
-        setTemplate(response.data);
+        const response = await getTemplateByUrl(url); // Gọi API
+        setTemplate(response.data); // Lưu dữ liệu template vào state
       } catch (error) {
         console.error("Error fetching template:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Dừng loading khi có kết quả
       }
     };
 
     fetchTemplate();
-  }, [templateId]);
+  }, [url]); // Chạy lại khi url thay đổi
 
+  // Hàm quay lại trang quản lý template
   const handleBack = () => {
-    navigate("/template"); // Navigate back to the template management page
+    navigate("/template");
   };
 
-  // Function to render components dynamically based on metadata
+  // Hàm render các component động từ metadata
   const renderComponent = (component) => {
     switch (component.type) {
       case "text":
@@ -45,9 +47,7 @@ const ViewTemplate = () => {
               color: component.style.color,
             }}
           >
-            <Typography variant="body1">
-              {component.text || "No text provided"}
-            </Typography>
+            <Typography variant="body1">{component.text || "No text provided"}</Typography>
           </Box>
         );
       case "circle":
@@ -64,8 +64,6 @@ const ViewTemplate = () => {
               backgroundColor: component.style.fillColor,
               borderColor: component.style.borderColor || "",
               borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
-              borderStyle: component.style.borderStyle || "none",
               opacity: component.style.opacity / 100 || "1",
             }}
           />
@@ -80,12 +78,8 @@ const ViewTemplate = () => {
               top: component.style.top,
               width: component.style.width,
               height: component.style.height,
-              backgroundColor: component.style.fillColor || "#ccc", // Default color if not provided
+              backgroundColor: component.style.fillColor || "#ccc",
               borderRadius: component.style.borderRadius || "0%",
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
-              borderStyle: component.style.borderStyle || "none",
               opacity: component.style.opacity / 100 || "1",
             }}
           />
@@ -102,10 +96,6 @@ const ViewTemplate = () => {
               height: component.style.height,
               overflow: "hidden",
               borderRadius: component.style.borderRadius || "0%",
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
-              borderStyle: component.style.borderStyle || "none",
               opacity: component.style.opacity / 100 || "1",
             }}
           >
@@ -115,12 +105,11 @@ const ViewTemplate = () => {
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover", // Adjust image to fit box
+                objectFit: "cover",
               }}
             />
           </Box>
         );
-      // Handle line case
       case "line":
         return (
           <Box
@@ -129,14 +118,13 @@ const ViewTemplate = () => {
               position: "absolute",
               left: component.style.left,
               top: component.style.top,
-              width: component.style.width, // Width of the line
-              height: component.style.height || 5, // Line height, default to 1px if not specified
-              backgroundColor: component.style.lineColor, // Line color
-              opacity: component.style.opacity / 100 || 1, // Set opacity
+              width: component.style.width,
+              height: component.style.height || 5,
+              backgroundColor: component.style.lineColor,
+              opacity: component.style.opacity / 100 || 1,
             }}
           />
         );
-
       default:
         return null;
     }
@@ -144,14 +132,7 @@ const ViewTemplate = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Typography variant="h6">Loading template...</Typography>
       </Box>
     );
@@ -159,14 +140,7 @@ const ViewTemplate = () => {
 
   if (!template) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Typography variant="h6">Template not found.</Typography>
       </Box>
     );
@@ -180,14 +154,9 @@ const ViewTemplate = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h6">Description</Typography>
-          <Typography>
-            {template.description || "No description provided."}
-          </Typography>
+          <Typography>{template.description || "No description provided."}</Typography>
         </Grid>
-        {/* <Grid item xs={12}>
-            <Typography variant="h6">Metadata</Typography>
-            <Typography>{template.metaData}</Typography>
-          </Grid> */}
+
         <Grid item xs={12}>
           <Typography variant="h6">Sections</Typography>
           {template.sections && template.sections.length > 0 ? (
@@ -204,10 +173,7 @@ const ViewTemplate = () => {
                   backgroundColor: "#f9f9f9",
                 }}
               >
-                <Typography variant="h6">
-                  Section: {section.name || "Unnamed"}
-                </Typography>
-                {/* Render the components inside the section */}
+                <Typography variant="h6">Section: {section.name || "Unnamed"}</Typography>
                 {section.metadata?.components?.map(renderComponent)}
               </Box>
             ))
@@ -216,6 +182,7 @@ const ViewTemplate = () => {
           )}
         </Grid>
       </Grid>
+
       <Box sx={{ marginTop: 2 }}>
         <Button variant="contained" onClick={handleBack}>
           Back to Template Management

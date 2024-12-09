@@ -1,5 +1,5 @@
 import axios from "axios";
-
+const baseURL= `${process.env.REACT_APP_API_BASE_URL}`
 // Tạo instance axios
 export const AdminAPI = axios.create({
   baseURL: `${process.env.REACT_APP_API_BASE_URL}`,
@@ -109,6 +109,16 @@ export const createSection = async (sectionData) => {
     throw error.response?.data || { message: "Failed to create section" };
   }
 };
+export const getTemplateByUrl = async (url) => {
+  try {
+    console.log("aa")
+    const response = await axios.get(`${baseURL}/templatesUser/by-url/${url}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching template by url:", error);
+    throw error;
+  }
+};
 
 export default {
   getAllTemplates,
@@ -117,4 +127,5 @@ export default {
   updateTemplate,
   deleteTemplateById,
   createSection,
+  getTemplateByUrl
 };

@@ -91,12 +91,8 @@ function App() {
         {/* New Template Page Route */}
         <Route path="/template/" element={<TemplatePage />} />
         <Route path="/template/create" element={<CreateTemplate />} />
-        <Route
-          path="/template/view/:templateId"
-          element={     
-                <ViewTemplate />             
-          }
-        />
+        <Route path="/template/view/:url" element={<ViewTemplate />} />
+
       </Routes>
     </Router>
   );

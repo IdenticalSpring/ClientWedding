@@ -5,13 +5,15 @@ import SignIn from "./sign-in/SignIn";
 import LandingPage from "./landing-page/LandingPage";
 import DashboardLayout from "./dashboard/Dashboard";
 import GuestList from "./dashboard/Clients";
-import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
+import PrivateRoute from "./components/privateRoute"; 
 import Event from "./dashboard/Event";
 import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
 import ActivateAccountPage from "./sign-up/ActiveAccount";
 import TemplatePage from "./user/template/TemplatePage"; 
 import TemplateDetail from "./user/template/TemplateDetail";
+import CreateTemplate from "./user/template/CreateTemplate";
+import ViewTemplate from "./user/template/ViewTemplate";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -88,7 +90,13 @@ function App() {
 
         {/* New Template Page Route */}
         <Route path="/template/" element={<TemplatePage />} />
-        <Route path="/template/:id" element={<TemplateDetail />} />
+        <Route path="/template/create" element={<CreateTemplate />} />
+        <Route
+          path="/template/view/:templateId"
+          element={     
+                <ViewTemplate />             
+          }
+        />
       </Routes>
     </Router>
   );

@@ -97,6 +97,7 @@ export default function SignIn(props) {
       if (result.success) {
         const token = result.data.access_token; 
         sessionStorage.setItem("access_token", token); 
+        
         window.location.href = "/"; 
       }
     } catch (error) {

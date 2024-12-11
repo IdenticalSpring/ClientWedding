@@ -1,20 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { userAPI } from "../../../service/user";
 import {
   Box,
   Typography,
-  Grid
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
+import { ArrowBack, Visibility, Save } from "@mui/icons-material";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import RenderComponent from "../../components/render/RenderComponent";
 
 const EditTemplate = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState(null);
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
@@ -32,6 +48,44 @@ const EditTemplate = () => {
 
     fetchTemplate();
   }, [id]);
+
+  const handleView = () => {
+    console.log("View");
+  };
+
+  const handleSave = async () => {
+    try {
+      const savedTemplate = await userAPI.createTemplateUser(
+        template,
+        template.thumbnailUrl
+      );
+      const templateID = savedTemplate.data?.id;
+
+      if (!templateID) {
+        throw new Error("Không thể lấy được templateId!");
+      }
+
+      const sectionsWithMetadata = template.sections.map((section) => ({
+        templateId: templateID,
+        metadata: {
+          components: section.components,
+        },
+      }));
+
+      for (const section of sectionsWithMetadata) {
+        await userAPI.createSectionUser(section);
+      }
+
+      showSnackbar("Lưu template và sections thành công!", "success");
+    } catch (error) {
+      console.error("Lỗi khi lưu template và sections:", error);
+      showSnackbar(error.message || "Lưu thất bại!", "error");
+    }
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   if (loading) {
     return (
@@ -69,41 +123,77 @@ const EditTemplate = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      {/* Sidebar */}
-      <Box
-        sx={{
-          width: "250px",
-          borderRight: "1px solid #ccc",
-          padding: 2,
-          backgroundColor: "#f4f4f4",
-        }}
-      >
-        <SidebarContent template={template} onSectionClick={handleSectionClick}/>
-      </Box>
-
-      {/* Main content */}
-      <Box sx={{ flex: 1, padding: 2, maxWidth: "100%", boxSizing: "border-box" }}>
-        {selectedSection ? (
-          <Box
-            sx={{
-              position: "relative",
-              border: "1px dashed #ccc",
-              padding: 2,
-              minHeight: "150px",
-              width: "100%",
-              backgroundColor: "#f9f9f9",
-              boxSizing: "border-box"
-            }}
+    <Box sx={{ display: "flex", height: "100vh", flexDirection: "column" }}>
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" onClick={handleBack}>
+            <ArrowBack />
+          </IconButton>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button
+            color="inherit"
+            startIcon={<Visibility />}
+            onClick={handleView}
+            sx={{ marginRight: 1 }}
           >
-            {/* Render components inside the selected section */}
-            {selectedSection.metadata?.components?.map((component) => (
-              <RenderComponent key={component.id} component={component} />
-            ))}
-          </Box>
-        ) : (
-          <Typography>Select a section to edit.</Typography>
-        )}
+            Xem
+          </Button>
+          <Button color="inherit" startIcon={<Save />} onClick={handleSave}>
+            Lưu
+          </Button>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+          >
+            <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+          </Snackbar>
+        </Toolbar>
+      </AppBar>
+
+      <Box sx={{ display: "flex", flex: 1 }}>
+        <Box
+          sx={{
+            width: "250px",
+            borderRight: "1px solid #ccc",
+            padding: 2,
+            backgroundColor: "#f4f4f4",
+          }}
+        >
+          <SidebarContent
+            template={template}
+            onSectionClick={handleSectionClick}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            flex: 1,
+            padding: 2,
+            maxWidth: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {selectedSection ? (
+            <Box
+              sx={{
+                position: "relative",
+                border: "1px dashed #ccc",
+                padding: 2,
+                minHeight: "150px",
+                width: "100%",
+                backgroundColor: "#f9f9f9",
+                boxSizing: "border-box",
+              }}
+            >
+              {selectedSection.metadata?.components?.map((component) => (
+                <RenderComponent key={component.id} component={component} />
+              ))}
+            </Box>
+          ) : (
+            <Typography>Select a section to edit.</Typography>
+          )}
+        </Box>
       </Box>
     </Box>
   );

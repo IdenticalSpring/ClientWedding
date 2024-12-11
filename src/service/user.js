@@ -177,4 +177,33 @@ export const userAPI = {
     const response = await request.get(`/templates/${id}`);
     return response.data;
   },
+  createTemplateUser: async (templateData, thumbnail) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", templateData.name);
+      formData.append("description", templateData.description);
+      formData.append("accessType", templateData.accessType);
+      formData.append("metaData", templateData.metaData);
+      if (thumbnail) formData.append("thumbnail", thumbnail);
+
+      const response = await request.post("/templates_user", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating template:", error);
+      throw error.response?.data || { message: "Failed to create template" };
+    }
+  },
+  createSectionUser: async (sectionData) => {
+    try {
+      const response = await request.post("/section_user", sectionData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating section:", error);
+      throw error.response?.data || { message: "Failed to create section" };
+    }
+  },
 };

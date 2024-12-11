@@ -159,16 +159,22 @@ export const userAPI = {
       throw error;
     }
   },
-  getAllTemplates: async (page , limit ) => {
+  getAllTemplates: async (page, limit) => {
     try {
       const response = await request.get(`/templates`, {
         params: { page, limit },
       });
-      return response.data; 
+      return response.data;
     } catch (error) {
-      console.error("Error fetching templates:", error.response?.data || error.message);
+      console.error(
+        "Error fetching templates:",
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
-
+  getTemplateById: async (id) => {
+    const response = await request.get(`/templates/${id}`);
+    return response.data;
+  },
 };

@@ -152,7 +152,7 @@ const TemplateContent = () => {
     };
 
     const handleTryNow = (templateId) => {
-        navigate(`/template/${templateId}`); 
+        navigate(`/template/edit/${templateId}`); 
     };
 
     if (loading) {

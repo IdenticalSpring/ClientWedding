@@ -80,7 +80,7 @@ const RenderComponent = ({ component, sectionRef }) => {
       if (newTop + dimensions.height > containerRect.height) {
         newTop = containerRect.height - dimensions.height;
       }
-  
+      console.log('New Position:', { left: newLeft, top: newTop });
       setPosition({
         left: newLeft,
         top: newTop,
@@ -255,7 +255,7 @@ const RenderComponent = ({ component, sectionRef }) => {
             height: component.style.height || 5,
             backgroundColor: component.style.lineColor,
             opacity: component.style.opacity / 100 || 1,
-            cursor: "move", // Thêm con trỏ di chuyển
+            cursor: "move",
           }}
           onMouseDown={handleMouseDownMove}
         >

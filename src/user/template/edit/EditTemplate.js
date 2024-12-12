@@ -10,19 +10,30 @@ import {
   Button,
   Snackbar,
   Alert,
+  TextField,
+  Slider,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import RenderComponent from "../../components/render/RenderComponent";
 
 const EditTemplate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [template, setTemplate] = useState(null);
+  const [template, setTemplate] = useState();
   const [loading, setLoading] = useState(true);
+  const [idUser, setIdUser] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedComponent, setSelectedComponent] = useState(null);
 
-  const sectionRef = useRef(null)
+  const sectionRef = useRef(null);
+  const handleComponentClick = (component) => {
+    setSelectedComponent(component);
+  };
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -34,6 +45,7 @@ const EditTemplate = () => {
     setSnackbar({ open: true, message, severity });
   };
   useEffect(() => {
+    const token = Cookies.get("token");
     const fetchTemplate = async () => {
       try {
         const response = await userAPI.getTemplateById(id);
@@ -46,6 +58,14 @@ const EditTemplate = () => {
       } finally {
         setLoading(false);
       }
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          setIdUser(decoded.sub);
+        } catch (error) {
+          console.error("Lỗi khi giải mã token:", error);
+        }
+      }
     };
 
     fetchTemplate();
@@ -55,12 +75,95 @@ const EditTemplate = () => {
     console.log("View");
   };
 
+  const handleStyleChange = (key, value) => {
+    if (selectedComponent) {
+      // Cập nhật giá trị style của selectedComponent
+      setSelectedComponent((prev) => ({
+        ...prev,
+        style: { ...prev.style, [key]: value },
+      }));
+
+      // Cập nhật giá trị trong template.sections
+      const updatedSections = template.sections.map((section) => ({
+        ...section,
+        metadata: {
+          ...section.metadata,
+          components: section.metadata.components.map((comp) =>
+            comp.id === selectedComponent.id
+              ? {
+                  ...comp,
+                  style: { ...comp.style, [key]: value },
+                }
+              : comp
+          ),
+        },
+      }));
+
+      // Cập nhật template
+      setTemplate((prev) => ({
+        ...prev,
+        sections: updatedSections,
+      }));
+    }
+  };
+
+  const handleTextChange = (value) => {
+    if (selectedComponent) {
+      // Cập nhật giá trị của selectedComponent
+      setSelectedComponent((prev) => ({
+        ...prev,
+        text: value,
+      }));
+
+      // Cập nhật giá trị trong template.sections
+      const updatedSections = template.sections.map((section) => ({
+        ...section,
+        metadata: {
+          ...section.metadata,
+          components: section.metadata.components.map((comp) =>
+            comp.id === selectedComponent.id ? { ...comp, text: value } : comp
+          ),
+        },
+      }));
+
+      setTemplate((prev) => ({
+        ...prev,
+        sections: updatedSections,
+      }));
+    }
+  };
+
+  // const handleFileUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const imageURL = URL.createObjectURL(file);
+  //     handleStyleChange("src", imageURL);
+  //   }
+  // };
+  console.log("id", idUser);
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        // Gọi API upload ảnh
+        const imageData = await userAPI.uploadImages(file);
+
+        // Lấy URL ảnh sau khi upload
+        const imageURL = imageData.url;
+
+        // Cập nhật src của component với URL ảnh mới
+        handleStyleChange("src", imageURL);
+      } catch (error) {
+        console.error("Lỗi khi upload ảnh:", error);
+        showSnackbar("Lỗi khi upload ảnh", "error");
+      }
+    }
+  };
+  // console.log("templates: " + template.thumbnailUrl);
   const handleSave = async () => {
     try {
-      const savedTemplate = await userAPI.createTemplateUser(
-        template,
-        template.thumbnailUrl
-      );
+      const savedTemplate = await userAPI.createTemplateUser(template);
+      console.log("Template:", savedTemplate);
       const templateID = savedTemplate.data?.id;
 
       if (!templateID) {
@@ -68,12 +171,14 @@ const EditTemplate = () => {
       }
 
       const sectionsWithMetadata = template.sections.map((section) => ({
-        templateId: templateID,
+        template_userId: templateID,
         metadata: {
-          components: section.components,
+          components: section.metadata.components,
         },
+        // userId: idUser,
       }));
 
+      console.log("Sections đã cập nhật:", sectionsWithMetadata);
       for (const section of sectionsWithMetadata) {
         await userAPI.createSectionUser(section);
       }
@@ -181,16 +286,108 @@ const EditTemplate = () => {
                 position: "relative",
                 border: "1px dashed #ccc",
                 padding: 2,
-                minHeight: "200px",
+                minHeight: selectedSection.metadata.style.minHeight,
                 width: "100%",
                 backgroundColor: "#f9f9f9",
                 boxSizing: "border-box",
                 overflow: "hidden",
               }}
             >
-              {selectedSection.metadata?.components?.map((component) => (
-                <RenderComponent key={component.id} component={component} sectionRef={sectionRef} />
-            ))}
+              {/* {selectedSection.metadata?.components?.map((component) => (
+                <RenderComponent
+                  key={component.id}
+                  component={component}
+                  sectionRef={sectionRef}
+                  onClick={handleComponentClick}
+                />
+              ))} */}
+              {selectedSection.metadata?.components?.map((component) => {
+                const updatedComponent = template.sections
+                  .find((section) => section.id === selectedSection.id)
+                  ?.metadata.components.find(
+                    (comp) => comp.id === component.id
+                  );
+
+                return (
+                  <RenderComponent
+                    key={component.id}
+                    component={updatedComponent || component}
+                    sectionRef={sectionRef}
+                    onClick={handleComponentClick}
+                  />
+                );
+              })}
+              {selectedComponent && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    width: "300px",
+                    background: "#fff",
+                    padding: 2,
+                    borderLeft: "1px solid #ccc",
+                  }}
+                >
+                  <h3>Edit Component</h3>
+                  {selectedComponent.type === "text" && (
+                    <>
+                      <TextField
+                        label="Text"
+                        value={selectedComponent.text || ""}
+                        onChange={(e) => handleTextChange(e.target.value)}
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      />
+                      <TextField
+                        type="color"
+                        label="Font Color"
+                        value={selectedComponent.style.color || "#000000"}
+                        onChange={(e) =>
+                          handleStyleChange("color", e.target.value)
+                        }
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      />
+                      <Slider
+                        value={selectedComponent.style.fontSize || 16}
+                        onChange={(e, value) =>
+                          handleStyleChange("fontSize", value)
+                        }
+                        min={10}
+                        max={72}
+                        step={1}
+                        sx={{ mb: 2 }}
+                      />
+                      <Select
+                        value={selectedComponent.style.fontFamily || "Arial"}
+                        onChange={(e) =>
+                          handleStyleChange("fontFamily", e.target.value)
+                        }
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      >
+                        <MenuItem value="Arial">Arial</MenuItem>
+                        <MenuItem value="Courier New">Courier New</MenuItem>
+                        <MenuItem value="Georgia">Georgia</MenuItem>
+                        <MenuItem value="Times New Roman">
+                          Times New Roman
+                        </MenuItem>
+                        <MenuItem value="Verdana">Verdana</MenuItem>
+                      </Select>
+                    </>
+                  )}
+
+                  {selectedComponent.type === "image" && (
+                    <TextField
+                      type="file"
+                      onChange={handleFileUpload}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                  )}
+                </Box>
+              )}
             </Box>
           ) : (
             <Typography>Select a section to edit.</Typography>

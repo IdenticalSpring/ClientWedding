@@ -177,14 +177,15 @@ export const userAPI = {
     const response = await request.get(`/templates/${id}`);
     return response.data;
   },
-  createTemplateUser: async (templateData, thumbnail) => {
+  createTemplateUser: async (templateData) => {
     try {
       const formData = new FormData();
       formData.append("name", templateData.name);
       formData.append("description", templateData.description);
       formData.append("accessType", templateData.accessType);
       formData.append("metaData", templateData.metaData);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
+      formData.append("thumbnailUrl", templateData.thumbnailUrl);
+      // formData.append("userId", templateData.userId);
 
       const response = await request.post("/templates_user", formData, {
         headers: {
@@ -204,6 +205,21 @@ export const userAPI = {
     } catch (error) {
       console.error("Error creating section:", error);
       throw error.response?.data || { message: "Failed to create section" };
+    }
+  },
+  uploadImages: async (image) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", image);
+      const response = await request.post("/images/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating image:", error);
+      throw error.response?.data || { message: "Failed to create image" };
     }
   },
 };

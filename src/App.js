@@ -10,7 +10,7 @@ import Event from "./dashboard/Event";
 import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
 import ActivateAccountPage from "./sign-up/ActiveAccount";
-import TemplatePage from "./user/template/TemplatePage"; 
+import TemplatePage from "./user/template/TemplatePage";
 import TemplateDetail from "./user/template/TemplateDetail";
 import EditTemplate from "./user/template/edit/EditTemplate";
 

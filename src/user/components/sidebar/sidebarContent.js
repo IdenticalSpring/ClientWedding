@@ -8,7 +8,12 @@ const SidebarContent = ({ template, onSectionClick }) => {
         <Grid>
           <Grid>
             <Typography
-              sx={{ textAlign: "center", color: "red", fontWeight: "bold",fontStyle: "italic", }}
+              sx={{
+                textAlign: "center",
+                color: "red",
+                fontWeight: "bold",
+                fontStyle: "italic",
+              }}
               variant="h6"
             >
               Template
@@ -20,7 +25,7 @@ const SidebarContent = ({ template, onSectionClick }) => {
                   sx={{
                     position: "relative",
                     border: "1px dashed #ccc",
-                    minHeight: "200px",
+                    minHeight: "300px",
                     width: "766px",
                     backgroundColor: "#f9f9f9",
                     transform: "scale(0.3)",

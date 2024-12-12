@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../../service/user";
 import {
@@ -14,6 +14,8 @@ const EditTemplate = () => {
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState(null);
+
+  const sectionRef = useRef(null)
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -83,22 +85,23 @@ const EditTemplate = () => {
       </Box>
 
       {/* Main content */}
-      <Box sx={{ flex: 1, padding: 2, maxWidth: "100%", boxSizing: "border-box" }}>
+      <Box ref={sectionRef} sx={{ flex: 1, padding: 2, maxWidth: "100%", boxSizing: "border-box" }}>
         {selectedSection ? (
           <Box
             sx={{
               position: "relative",
               border: "1px dashed #ccc",
               padding: 2,
-              minHeight: "150px",
+              minHeight: "200px",
               width: "100%",
               backgroundColor: "#f9f9f9",
-              boxSizing: "border-box"
+              boxSizing: "border-box",
+              overflow: "hidden",
             }}
           >
             {/* Render components inside the selected section */}
             {selectedSection.metadata?.components?.map((component) => (
-              <RenderComponent key={component.id} component={component} />
+              <RenderComponent key={component.id} component={component} sectionRef={sectionRef} />
             ))}
           </Box>
         ) : (

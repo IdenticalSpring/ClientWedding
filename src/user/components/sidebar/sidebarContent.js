@@ -3,11 +3,16 @@ import { Box, Typography, Grid } from "@mui/material";
 import RenderComponent from "../render/RenderComponent";
 const SidebarContent = ({ template, onSectionClick }) => {
   return (
-    <div style={{ marginTop: "50px" }}>
+    <div>
       <Box>
         <Grid>
           <Grid>
-            <Typography variant="h6">Sections</Typography>
+            <Typography
+              sx={{ textAlign: "center", color: "red", fontWeight: "bold",fontStyle: "italic", }}
+              variant="h6"
+            >
+              Template
+            </Typography>
             {template.sections && template.sections.length > 0 ? (
               template.sections.map((section) => (
                 <Box

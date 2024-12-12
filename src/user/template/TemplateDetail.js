@@ -42,9 +42,10 @@ const TemplateDetail = (props) => {
               height: component.style.height,
               fontSize: component.style.fontSize,
               color: component.style.color,
+              fontFamily: component.style.fontFamily,
             }}
           >
-            <Typography variant="body1">
+            <Typography variant={component.style.fontSize}>
               {component.text || "No text provided"}
             </Typography>
           </Box>
@@ -109,7 +110,7 @@ const TemplateDetail = (props) => {
             }}
           >
             <img
-              src={component.src.startsWith("data:image") ? component.src : ""}
+              src={component.src ? component.src : ""}
               alt="image component"
               style={{
                 width: "100%",

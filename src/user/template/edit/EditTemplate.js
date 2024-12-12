@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { userAPI } from "../../../service/user";
 import {
@@ -21,6 +21,8 @@ const EditTemplate = () => {
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState(null);
+
+  const sectionRef = useRef(null)
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -119,7 +121,6 @@ const EditTemplate = () => {
 
   const handleSectionClick = (section) => {
     setSelectedSection(section);
-    console.log("Selected section:", section);
   };
 
   return (
@@ -151,7 +152,7 @@ const EditTemplate = () => {
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ display: "flex", flex: 1 }}>
+      <Box ref={sectionRef} sx={{ display: "flex", flex: 1 }}>
         <Box
           sx={{
             width: "250px",
@@ -180,15 +181,16 @@ const EditTemplate = () => {
                 position: "relative",
                 border: "1px dashed #ccc",
                 padding: 2,
-                minHeight: "150px",
+                minHeight: "200px",
                 width: "100%",
                 backgroundColor: "#f9f9f9",
                 boxSizing: "border-box",
+                overflow: "hidden",
               }}
             >
               {selectedSection.metadata?.components?.map((component) => (
-                <RenderComponent key={component.id} component={component} />
-              ))}
+                <RenderComponent key={component.id} component={component} sectionRef={sectionRef} />
+            ))}
             </Box>
           ) : (
             <Typography>Select a section to edit.</Typography>

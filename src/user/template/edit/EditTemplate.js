@@ -152,7 +152,7 @@ const EditTemplate = () => {
         </Toolbar>
       </AppBar>
 
-      <Box ref={sectionRef} sx={{ flex: 1, padding: 2, maxWidth: "100%", boxSizing: "border-box" }}>
+      <Box ref={sectionRef} sx={{ display: "flex", flex: 1 }}>
         <Box
           sx={{
             width: "250px",

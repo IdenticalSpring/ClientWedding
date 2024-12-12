@@ -29,6 +29,7 @@ const EditTemplate = () => {
   const [idUser, setIdUser] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
+  const [isPreview, setIsPreview] = useState(false);
 
   const sectionRef = useRef(null);
   const handleComponentClick = (component) => {
@@ -162,7 +163,7 @@ const EditTemplate = () => {
   // console.log("templates: " + template.thumbnailUrl);
   const handleSave = async () => {
     try {
-      const savedTemplate = await userAPI.createTemplateUser(template);
+      const savedTemplate = await userAPI.createTemplateUser(template, idUser);
       console.log("Template:", savedTemplate);
       const templateID = savedTemplate.data?.id;
 
@@ -175,7 +176,6 @@ const EditTemplate = () => {
         metadata: {
           components: section.metadata.components,
         },
-        // userId: idUser,
       }));
 
       console.log("Sections đã cập nhật:", sectionsWithMetadata);

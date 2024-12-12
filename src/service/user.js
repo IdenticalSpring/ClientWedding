@@ -177,7 +177,7 @@ export const userAPI = {
     const response = await request.get(`/templates/${id}`);
     return response.data;
   },
-  createTemplateUser: async (templateData) => {
+  createTemplateUser: async (templateData, UserId) => {
     try {
       const formData = new FormData();
       formData.append("name", templateData.name);
@@ -185,7 +185,7 @@ export const userAPI = {
       formData.append("accessType", templateData.accessType);
       formData.append("metaData", templateData.metaData);
       formData.append("thumbnailUrl", templateData.thumbnailUrl);
-      // formData.append("userId", templateData.userId);
+      formData.append("userId", UserId);
 
       const response = await request.post("/templates_user", formData, {
         headers: {

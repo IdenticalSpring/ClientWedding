@@ -11,12 +11,18 @@ import {
   TableRow,
   IconButton,
   Pagination,
+  Divider,
 } from "@mui/material";
-import { CopyAll as CopyIcon } from "@mui/icons-material";
+import {
+  CopyAll as CopyIcon,
+  Visibility as VisibilityIcon,
+} from "@mui/icons-material";
 import Header from "../dashboard/components/Header";
 import { userAPI } from "../service/user";
+import { useNavigate } from "react-router-dom";
 
 const WebsiteManagement = () => {
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,6 +54,11 @@ const WebsiteManagement = () => {
     navigator.clipboard.writeText(text).then(() => {
       alert("Đã sao chép thành công!");
     });
+  };
+
+  const handleViewDetails = (template) => {
+    alert(`Chi tiết về template: ${template.name}`);
+    navigate(`/template/${template.id}`);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -83,9 +94,19 @@ const WebsiteManagement = () => {
                     <TableCell>
                       {template.description || "Chưa có mô tả"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
                       <IconButton onClick={() => handleCopy(template.name)}>
                         <CopyIcon />
+                      </IconButton>
+                      <Divider
+                        orientation="vertical"
+                        flexItem
+                        sx={{
+                          marginX: 1,
+                        }}
+                      />
+                      <IconButton onClick={() => handleViewDetails(template)}>
+                        <VisibilityIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>

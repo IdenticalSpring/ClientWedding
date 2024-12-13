@@ -177,6 +177,10 @@ export const userAPI = {
     const response = await request.get(`/templates/${id}`);
     return response.data;
   },
+  getTemplateUserById: async (id) => {
+    const response = await request.get(`/templates_user/${id}`);
+    return response.data;
+  },
   createTemplateUser: async (templateData, UserId) => {
     try {
       const formData = new FormData();

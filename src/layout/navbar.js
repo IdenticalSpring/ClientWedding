@@ -226,7 +226,7 @@ export default function AppAppBar() {
                       <ListItemIcon>
                         <ListAltIcon fontSize="small" />
                       </ListItemIcon>
-                      <ListItemText primary="Quản lý khách mời" />
+                      <ListItemText primary="Quản lý" />
                     </StyledMenuItem>
                     <StyledMenuItem onClick={handleLogout}>
                       <ListItemIcon>

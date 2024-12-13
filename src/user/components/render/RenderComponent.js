@@ -79,10 +79,10 @@ const RenderComponent = ({ component, sectionRef, onClick }) => {
             borderStyle: component.style.borderStyle || "none",
             opacity: component.style.opacity / 100 || "1",
           }}
-          onClick={() => onClick(component)}
+          onClick={() => onClick && onClick(component)}
         >
           <img
-            src={component.src ? component.src : ""}
+            src={component.src}
             alt="image component"
             style={{
               width: "100%",

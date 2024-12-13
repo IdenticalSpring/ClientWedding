@@ -178,41 +178,7 @@ const EditTemplate = () => {
       }
     }
   };
-
-  // const handleSave = async () => {
-  //   try {
-  //     const savedTemplate = await userAPI.createTemplateUser(template, idUser);
-  //     const templateID = savedTemplate.data?.id;
-
-  //     if (!templateID) {
-  //       throw new Error("Không thể lấy được templateId!");
-  //     }
-
-  //     const sectionsWithMetadata = template.sections.map((section) => ({
-  //       template_userId: templateID,
-  //       metadata: {
-  //         components: section.metadata.components,
-  //       },
-  //     }));
-
-  //     for (const section of sectionsWithMetadata) {
-  //       await userAPI.createSectionUser(section);
-  //     }
-
-  //     // Tạo URL với hai tên
-  //     const encodedName = encodeURIComponent(template.name);
-  //     const encodedUserName = encodeURIComponent(template.userName);
-  //     const viewURL = `${window.location.origin}/view/${templateID}-${encodedName}-${encodedUserName}`;
-
-  //     showSnackbar(`Lưu thành công! URL: ${viewURL}`, "success");
-
-  //     // In ra URL hoặc chuyển hướng nếu cần
-  //     console.log("Template URL:", viewURL);
-  //   } catch (error) {
-  //     console.error("Lỗi khi lưu template và sections:", error);
-  //     showSnackbar(error.message || "Lưu thất bại!", "error");
-  //   }
-  // };
+  
   const handleSave = async () => {
     // Kiểm tra nếu tên cô dâu và chú rể không rỗng
     if (!brideName || !groomName) {
@@ -233,6 +199,7 @@ const EditTemplate = () => {
         template_userId: templateID,
         metadata: {
           components: section.metadata.components,
+          style: section?.metadata?.style,
         },
       }));
 
@@ -243,12 +210,9 @@ const EditTemplate = () => {
       // Cập nhật URL với tên cô dâu và chú rể
       const encodedBrideName = encodeURIComponent(brideName);
       const encodedGroomName = encodeURIComponent(groomName);
-      const viewURL = `${window.location.origin}/view/${templateID}-${encodedBrideName}-${encodedGroomName}`;
-
-      showSnackbar(`Lưu thành công! URL: ${viewURL}`, "success");
-
+      const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
       // Sử dụng navigate để chuyển tới trang view
-      navigate(`/view/${templateID}-${encodedBrideName}-${encodedGroomName}`);
+      navigate(`/view/${templateID}/${encodedBrideName}/${encodedGroomName}`);
     } catch (error) {
       console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");

@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import CssBaseline from "@mui/material/CssBaseline";
-// import FloatingButtons from "./components/FloatingButtons";
-import AppAppBar from "../../layout/navbar";
-import Footer from "../../layout/footer";
-import AppTheme from "../../components/shared-theme/AppTheme";
 import { userAPI } from "../../service/user";
 import { Box, Typography, Grid } from "@mui/material";
 const TemplateDetail = (props) => {
@@ -50,26 +45,39 @@ const TemplateDetail = (props) => {
             </Typography>
           </Box>
         );
-      case "circle":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width,
-              height: component.style.height,
-              borderRadius: "50%",
-              backgroundColor: component.style.fillColor,
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
-              borderStyle: component.style.borderStyle || "none",
-              opacity: component.style.opacity / 100 || "1",
-            }}
-          />
-        );
+        case "circle":
+          return (
+            <Box
+              key={component.id}
+              sx={{
+                position: "absolute",
+                left: component.style.left,
+                top: component.style.top,
+                width: component.style.width,
+                height: component.style.height,
+                borderRadius: component.style.borderRadius || "0%",
+                backgroundColor: component.style.fillColor,
+                borderColor: component.style.borderColor || "",
+                borderWidth: component.style.borderWidth || "0px",
+                borderStyle: component.style.borderStyle || "none",
+                opacity: component.style.opacity / 100 || "1",
+              }}
+            >
+              <img
+                src={component.src || ""}
+                alt="image component"
+                style={{
+                  width: component.style.width,
+                  height: component.style.height,
+                  objectFit: "cover",
+                  borderRadius:
+                    component.type === "circle"
+                      ? "50%"
+                      : component.style.borderRadius,
+                }}
+              />
+            </Box>
+          );
       case "rect":
         return (
           <Box
@@ -84,7 +92,6 @@ const TemplateDetail = (props) => {
               borderRadius: component.style.borderRadius || "0%",
               borderColor: component.style.borderColor || "",
               borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
               borderStyle: component.style.borderStyle || "none",
               opacity: component.style.opacity / 100 || "1",
             }}
@@ -104,7 +111,6 @@ const TemplateDetail = (props) => {
               borderRadius: component.style.borderRadius || "0%",
               borderColor: component.style.borderColor || "",
               borderWidth: component.style.borderWidth || "0px",
-              borderColor: component.style.borderColor || "",
               borderStyle: component.style.borderStyle || "none",
               opacity: component.style.opacity / 100 || "1",
             }}
@@ -173,20 +179,10 @@ const TemplateDetail = (props) => {
   }
 
   return (
-    <div style={{ marginTop: "50px" }}>
+    <>
       <Box sx={{ padding: 2 }}>
-        {/* <Typography variant="h4" gutterBottom>
-            View Template: {template.name || "Untitled"}
-          </Typography> */}
         <Grid container spacing={2}>
-          {/* <Grid item xs={12}>
-              <Typography variant="h6">Description</Typography>
-              <Typography>
-                {template.description || "No description provided."}
-              </Typography>
-            </Grid> */}
           <Grid item xs={12}>
-            <Typography variant="h6">Sections</Typography>
             {template.sections && template.sections.length > 0 ? (
               template.sections.map((section) => (
                 <Box
@@ -195,16 +191,13 @@ const TemplateDetail = (props) => {
                     position: "relative",
                     border: "1px dashed #ccc",
                     padding: 2,
-                    minHeight: "150px",
+                    minHeight: section?.metadata?.style?.minHeight,
+                    minWidth: section?.metadata?.style?.minWidth,
                     marginBottom: 2,
-                    width: "766px",
                     backgroundColor: "#f9f9f9",
+                    overflow: "hidden",
                   }}
                 >
-                  {/* <Typography variant="h6">
-                      Section: {section.name || "Unnamed"}
-                    </Typography> */}
-                  {/* Render the components inside the section */}
                   {section.metadata?.components?.map(renderComponent)}
                 </Box>
               ))
@@ -214,7 +207,7 @@ const TemplateDetail = (props) => {
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   );
 };
 

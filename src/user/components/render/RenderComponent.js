@@ -24,25 +24,39 @@ const RenderComponent = ({ component, sectionRef, onClick }) => {
           </Typography>
         </Box>
       );
-    case "circle":
-      return (
-        <Box
-          key={component.id}
-          sx={{
-            position: "absolute",
-            left: component.style.left,
-            top: component.style.top,
-            width: component.style.width,
-            height: component.style.height,
-            borderRadius: "50%",
-            backgroundColor: component.style.fillColor,
-            borderColor: component.style.borderColor || "",
-            borderWidth: component.style.borderWidth || "0px",
-            borderStyle: component.style.borderStyle || "none",
-            opacity: component.style.opacity / 100 || "1",
-          }}
-        ></Box>
-      );
+      case "circle":
+        return (
+          <Box
+            key={component.id}
+            sx={{
+              position: "absolute",
+              left: component.style.left,
+              top: component.style.top,
+              width: component.style.width,
+              height: component.style.height,
+              borderRadius: component.style.borderRadius || "0%",
+              backgroundColor: component.style.fillColor,
+              borderColor: component.style.borderColor || "",
+              borderWidth: component.style.borderWidth || "0px",
+              borderStyle: component.style.borderStyle || "none",
+              opacity: component.style.opacity / 100 || "1",
+            }}
+          >
+            <img
+              src={component.src || ""}
+              alt="image component"
+              style={{
+                width: component.style.width,
+                height: component.style.height,
+                objectFit: "cover",
+                borderRadius:
+                  component.type === "circle"
+                    ? "50%"
+                    : component.style.borderRadius,
+              }}
+            />
+          </Box>
+        );
     case "rect":
       return (
         <Box

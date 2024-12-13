@@ -226,4 +226,8 @@ export const userAPI = {
       throw error.response?.data || { message: "Failed to create image" };
     }
   },
+  getAllTemplateById: async (id, page, limit) => {
+    const response = await request.get(`/templates_user?userId=${id}&page=${page}&limit=${limit}`);
+    return response.data;
+  },
 };

@@ -7,6 +7,7 @@ import DashboardLayout from "./dashboard/Dashboard";
 import GuestList from "./dashboard/Clients";
 import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
 import Event from "./dashboard/Event";
+import WebsiteManagement from "./dashboard/WebsiteManagement";
 import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
 import ActivateAccountPage from "./sign-up/ActiveAccount";
@@ -61,6 +62,19 @@ function App() {
           }
         />
         <Route
+          path="/quanlywebsite/"
+          element={
+            <PrivateRoute
+              isAuthenticated={isAuthenticated}
+              element={
+                <DashboardLayout>
+                  <WebsiteManagement />
+                </DashboardLayout>
+              }
+            />
+          }
+        />
+        <Route
           path="/quanlydamcuoi/"
           element={
             <PrivateRoute
@@ -93,7 +107,7 @@ function App() {
         <Route path="/template/:id" element={<TemplateDetail />} />
         <Route path="/template/edit/:id" element={<EditTemplate />} />
         <Route
-          path="/view/:templateID-:brideName-:groomName"
+          path="/view/:templateID/:brideName/:groomName"
           element={<ViewTemplate />}
         />
       </Routes>

@@ -6,6 +6,8 @@ import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 const ViewTemplate = () => {
   const { templateID, brideName, groomName } = useParams();
   const [template, setTemplate] = useState(null);
+  console.log("🚀 ~ ViewTemplate ~ template:", template?.section_user);
+
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -16,7 +18,6 @@ const ViewTemplate = () => {
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        // Lấy thông tin template từ API bằng templateID
         const response = await userAPI.getTemplateUserById(templateID);
         setTemplate(response.data);
       } catch (error) {
@@ -75,21 +76,20 @@ const ViewTemplate = () => {
       </Typography>
 
       <Box>
-        {template.sections.map((section, index) => (
+        {template?.section_user?.map((section, index) => (
           <Box
             key={index}
             sx={{
               position: "relative",
               border: "1px solid #ccc",
               padding: 2,
-              minHeight: section.metadata.style.minHeight,
+              minHeight: section?.metadata?.style?.minHeight,
               width: "100%",
               boxSizing: "border-box",
             }}
           >
             {section.metadata?.components?.map((component) => (
               <Box key={component.id} sx={{ marginBottom: 2 }}>
-                {/* Render each component based on its type */}
                 {component.type === "text" && (
                   <Typography
                     variant="body1"
@@ -103,7 +103,39 @@ const ViewTemplate = () => {
                   </Typography>
                 )}
                 {component.type === "image" && component.src && (
-                  <img src={component.src} alt={component.alt} width="100%" />
+                  <img
+                    src={component.src}
+                    alt={component.alt}
+                    width={component.style?.width || "100%"}
+                    height={component.style?.height || "auto"}
+                    style={{
+                      position: "absolute",
+                      top: component.style?.top || 0,
+                      left: component.style?.left || 0,
+                      bottom: component.style?.bottom || "auto",
+                      right: component.style?.right || "auto",
+                    }}
+                  />
+                )}
+                {component.type === "circle" && (
+                  <Box
+                    sx={{
+                      width: component.style?.size || 50,
+                      height: component.style?.size || 50,
+                      borderRadius: "50%",
+                      backgroundColor: component.style?.color || "blue",
+                    }}
+                  />
+                )}
+
+                {component.type === "rect" && (
+                  <Box
+                    sx={{
+                      width: component.style?.width || 100,
+                      height: component.style?.height || 50,
+                      backgroundColor: component.style?.fillColor || "green",
+                    }}
+                  />
                 )}
               </Box>
             ))}

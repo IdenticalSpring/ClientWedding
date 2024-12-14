@@ -188,7 +188,12 @@ const EditTemplate = () => {
     }
 
     try {
-      const savedTemplate = await userAPI.createTemplateUser(template, idUser, groomName, brideName);
+      const savedTemplate = await userAPI.createTemplateUser(
+        template,
+        idUser,
+        groomName,
+        brideName
+      );
       const templateID = savedTemplate.data?.id;
 
       if (!templateID) {
@@ -260,10 +265,9 @@ const EditTemplate = () => {
     return (
       <Box
         sx={{
-          position: "relative",
-          width: "100%",
-          height: "100vh",
-          backgroundColor: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         {template.sections.map((section, index) => (
@@ -274,8 +278,10 @@ const EditTemplate = () => {
               border: "1px solid #ccc",
               padding: 2,
               minHeight: section.metadata.style.minHeight,
-              width: "100%",
+              minWidth: section?.metadata?.style?.minWidth,
               boxSizing: "border-box",
+              overflow: "hidden",
+              marginBottom: 2,
             }}
           >
             {section.metadata?.components?.map((component) => (

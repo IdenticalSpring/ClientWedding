@@ -178,7 +178,7 @@ const EditTemplate = () => {
       }
     }
   };
-  
+
   const handleSave = async () => {
     // Kiểm tra nếu tên cô dâu và chú rể không rỗng
     if (!brideName || !groomName) {
@@ -188,7 +188,7 @@ const EditTemplate = () => {
     }
 
     try {
-      const savedTemplate = await userAPI.createTemplateUser(template, idUser);
+      const savedTemplate = await userAPI.createTemplateUser(template, idUser, groomName, brideName);
       const templateID = savedTemplate.data?.id;
 
       if (!templateID) {
@@ -210,7 +210,7 @@ const EditTemplate = () => {
       // Cập nhật URL với tên cô dâu và chú rể
       const encodedBrideName = encodeURIComponent(brideName);
       const encodedGroomName = encodeURIComponent(groomName);
-      const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
+      // const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
       // Sử dụng navigate để chuyển tới trang view
       navigate(`/view/${templateID}/${encodedBrideName}/${encodedGroomName}`);
     } catch (error) {

@@ -6,7 +6,6 @@ import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 const ViewTemplate = () => {
   const { templateID, brideName, groomName } = useParams();
   const [template, setTemplate] = useState(null);
-  console.log("🚀 ~ ViewTemplate ~ template:", template?.section_user);
 
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
@@ -75,7 +74,13 @@ const ViewTemplate = () => {
         {`Cô dâu: ${brideName} - Chú rể: ${groomName}`}
       </Typography>
 
-      <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         {template?.section_user?.map((section, index) => (
           <Box
             key={index}
@@ -84,8 +89,10 @@ const ViewTemplate = () => {
               border: "1px solid #ccc",
               padding: 2,
               minHeight: section?.metadata?.style?.minHeight,
-              width: "100%",
+              minWidth: section?.metadata?.style?.minWidth,
               boxSizing: "border-box",
+              marginBottom: 2,
+              overflow: "hidden",
             }}
           >
             {section.metadata?.components?.map((component) => (
@@ -97,6 +104,13 @@ const ViewTemplate = () => {
                       color: component.style.color,
                       fontSize: component.style.fontSize,
                       fontFamily: component.style.fontFamily,
+                      position: "absolute",
+                      top: component.style?.top || 0,
+                      left: component.style?.left || 0,
+                      bottom: component.style?.bottom || "auto",
+                      right: component.style?.right || "auto",
+                      width: component.style?.width,
+                      height: component.style?.height,
                     }}
                   >
                     {component.text}
@@ -109,23 +123,44 @@ const ViewTemplate = () => {
                     width={component.style?.width || "100%"}
                     height={component.style?.height || "auto"}
                     style={{
+                      zIndex: -1,
                       position: "absolute",
                       top: component.style?.top || 0,
                       left: component.style?.left || 0,
                       bottom: component.style?.bottom || "auto",
                       right: component.style?.right || "auto",
+                      objectFit: "cover",
                     }}
                   />
                 )}
                 {component.type === "circle" && (
                   <Box
                     sx={{
-                      width: component.style?.size || 50,
-                      height: component.style?.size || 50,
+                      // width: component.style?.size || 50,
+                      // height: component.style?.size || 50,
                       borderRadius: "50%",
-                      backgroundColor: component.style?.color || "blue",
+                      backgroundColor: component.style?.fillColor,
+                      position: "absolute",
+                      top: component.style?.top || 0,
+                      left: component.style?.left || 0,
+                      bottom: component.style?.bottom || "auto",
+                      right: component.style?.right || "auto",
                     }}
-                  />
+                  >
+                    <img
+                      src={component.src || ""}
+                      alt="image component"
+                      style={{
+                        width: component.style.width,
+                        height: component.style.height,
+                        objectFit: "cover",
+                        borderRadius:
+                          component.type === "circle"
+                            ? "50%"
+                            : component.style.borderRadius,
+                      }}
+                    />
+                  </Box>
                 )}
 
                 {component.type === "rect" && (
@@ -134,6 +169,11 @@ const ViewTemplate = () => {
                       width: component.style?.width || 100,
                       height: component.style?.height || 50,
                       backgroundColor: component.style?.fillColor || "green",
+                      position: "absolute",
+                      top: component.style?.top || 0,
+                      left: component.style?.left || 0,
+                      bottom: component.style?.bottom || "auto",
+                      right: component.style?.right || "auto",
                     }}
                   />
                 )}

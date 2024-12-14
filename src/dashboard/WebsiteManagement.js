@@ -58,7 +58,10 @@ const WebsiteManagement = () => {
 
   const handleViewDetails = (template) => {
     alert(`Chi tiết về template: ${template.name}`);
-    navigate(`/template/${template.id}`);
+    console.log(template?.brideName);
+    console.log(template?.groomName);
+    
+    navigate(`/view/${template?.id}/${template?.brideName}/${template?.groomName}`);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -70,7 +73,7 @@ const WebsiteManagement = () => {
       <Header />
       <Box sx={{ alignItems: "center" }}>
         <Typography variant="h4" gutterBottom>
-          Quản lý khách mời
+          Website template đã lưu
         </Typography>
 
         {loading && <CircularProgress />}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import SignUp from "./sign-up/SignUp";
 import SignIn from "./sign-in/SignIn";
 import LandingPage from "./landing-page/LandingPage";
@@ -44,7 +44,11 @@ function App() {
           element={
             <PrivateRoute
               isAuthenticated={isAuthenticated}
-              element={<DashboardLayout />}
+              element={
+                <DashboardLayout>
+                  <Navigate to="/quanlywebsite/" replace />
+                </DashboardLayout>
+              }
             />
           }
         />

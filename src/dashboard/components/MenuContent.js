@@ -16,8 +16,8 @@ const mainListItems = [
     text: "Quản lý",
     dropdown: true,
     children: [
-      { text: "Quản lý khách mời", link: "/quanlykhachmoi/" },
       { text: "Quản lý website thiệp cưới", link: "/quanlywebsite/" },
+      { text: "Quản lý khách mời", link: "/quanlykhachmoi/" },
       { text: "Quản lý đám cưới", link: "/quanlydamcuoi/" },
     ],
   },

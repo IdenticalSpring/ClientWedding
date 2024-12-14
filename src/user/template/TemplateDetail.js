@@ -45,39 +45,39 @@ const TemplateDetail = (props) => {
             </Typography>
           </Box>
         );
-        case "circle":
-          return (
-            <Box
-              key={component.id}
-              sx={{
-                position: "absolute",
-                left: component.style.left,
-                top: component.style.top,
+      case "circle":
+        return (
+          <Box
+            key={component.id}
+            sx={{
+              position: "absolute",
+              left: component.style.left,
+              top: component.style.top,
+              width: component.style.width,
+              height: component.style.height,
+              borderRadius: component.style.borderRadius || "0%",
+              backgroundColor: component.style.fillColor,
+              borderColor: component.style.borderColor || "",
+              borderWidth: component.style.borderWidth || "0px",
+              borderStyle: component.style.borderStyle || "none",
+              opacity: component.style.opacity / 100 || "1",
+            }}
+          >
+            <img
+              src={component.src || ""}
+              alt="image component"
+              style={{
                 width: component.style.width,
                 height: component.style.height,
-                borderRadius: component.style.borderRadius || "0%",
-                backgroundColor: component.style.fillColor,
-                borderColor: component.style.borderColor || "",
-                borderWidth: component.style.borderWidth || "0px",
-                borderStyle: component.style.borderStyle || "none",
-                opacity: component.style.opacity / 100 || "1",
+                objectFit: "cover",
+                borderRadius:
+                  component.type === "circle"
+                    ? "50%"
+                    : component.style.borderRadius,
               }}
-            >
-              <img
-                src={component.src || ""}
-                alt="image component"
-                style={{
-                  width: component.style.width,
-                  height: component.style.height,
-                  objectFit: "cover",
-                  borderRadius:
-                    component.type === "circle"
-                      ? "50%"
-                      : component.style.borderRadius,
-                }}
-              />
-            </Box>
-          );
+            />
+          </Box>
+        );
       case "rect":
         return (
           <Box
@@ -180,8 +180,15 @@ const TemplateDetail = (props) => {
 
   return (
     <>
-      <Box sx={{ padding: 2 }}>
-        <Grid container spacing={2}>
+      <Box
+        sx={{
+          padding: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Grid spacing={2}>
           <Grid item xs={12}>
             {template.sections && template.sections.length > 0 ? (
               template.sections.map((section) => (
@@ -192,7 +199,7 @@ const TemplateDetail = (props) => {
                     border: "1px dashed #ccc",
                     padding: 2,
                     minHeight: section?.metadata?.style?.minHeight,
-                    minWidth: section?.metadata?.style?.minWidth,
+                    width: section?.metadata?.style?.minWidth,
                     marginBottom: 2,
                     backgroundColor: "#f9f9f9",
                     overflow: "hidden",

@@ -98,13 +98,15 @@ export const userAPI = {
       throw error;
     }
   },
-  getAllWedding: async (guestData) => {
+  getAllWedding: async (userId) => {
     try {
-      const response = await request.get(`/wedding-details`, guestData);
+      const response = await request.get(`/wedding-details`, {
+        params: { userId }, // Truyền userId vào query string
+      });
       return response.data;
     } catch (error) {
       console.error(
-        "Error adding guest:",
+        "Error fetching weddings:",
         error.response?.data || error.message
       );
       throw error;
@@ -256,5 +258,14 @@ export const userAPI = {
       `/templates_user?userId=${id}&page=${page}&limit=${limit}`
     );
     return response.data;
+  },
+  createWedding: async (wedding) => {
+    try {
+      const response = await request.post(`/wedding-details`, wedding);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding wedding:", error);
+      throw error.response?.data || { message: "Failed to add wedding" };
+    }
   },
 };

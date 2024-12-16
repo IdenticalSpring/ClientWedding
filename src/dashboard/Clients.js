@@ -1,24 +1,27 @@
-// import React, { useState, useEffect } from "react";
-// import {
-//   Typography,
-//   Button,
-//   Box,
-//   Snackbar,
-//   Alert,
-//   Skeleton,
-//   MenuItem,
-//   Select,
-//   InputLabel,
-//   FormControl,
-// } from "@mui/material";
-// import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-// import EditIcon from "@mui/icons-material/Edit";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import AddIcon from "@mui/icons-material/Add";
-// import Header from "../dashboard/components/Header";
-// import { userAPI } from "../service/user"; // Gọi API từ AdminAPI
-// import ModalConfirmDelete from "../dashboard/modal-clients/DeleteUser";
-// import ModalAddUser from "../dashboard/modal-clients/CreateUser";
+import React, { useState, useEffect } from "react";
+import {
+  Typography,
+  Button,
+  Box,
+  Snackbar,
+  Alert,
+  Skeleton,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Header from "../dashboard/components/Header";
+import { userAPI } from "../service/user"; // Gọi API từ AdminAPI
+import ModalConfirmDelete from "../dashboard/modal-clients/DeleteUser";
+import ModalAddUser from "../dashboard/modal-clients/CreateUser";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import ModalCreateWedding from "./modal-wedding/CreateWedding";
 
 // const Clients = () => {
 //   const [guests, setGuests] = useState([]); // Lưu danh sách khách mời
@@ -40,7 +43,9 @@
 //   // Gọi API để lấy danh sách đám cưới
 //   const fetchWeddings = async () => {
 //     try {
-//       const response = await userAPI.getAllWedding(); // Giả sử có API này
+//       const token = Cookies.get("token");
+//       const decoded = jwtDecode(token);
+//       const response = await userAPI.getAllWedding(decoded.sub); // Giả sử có API này
 //       setWeddingList(response.data); // Lưu danh sách đám cưới
 //     } catch (error) {
 //       console.error("Error fetching weddings:", error);
@@ -166,6 +171,23 @@
 //           startIcon={<AddIcon />}
 //           onClick={() => setOpenAddModal(true)}
 //         >
+//           Thêm đám cưới
+//         </Button>
+//         <Button
+//           variant="text-container"
+//           sx={{
+//             minWidth: "fit-content",
+//             backgroundColor: "hsl(345, 75%, 42%)",
+//             color: "hsl(5, 90%, 95%)",
+//             "&:hover": {
+//               backgroundColor: "hsl(340, 80%, 38%)",
+//               opacity: 0.8,
+//             },
+//             alignSelf: "center",
+//           }}
+//           startIcon={<AddIcon />}
+//           onClick={() => setOpenAddModal(true)}
+//         >
 //           Thêm khách mời
 //         </Button>
 //       </Box>
@@ -242,6 +264,13 @@
 //         onClose={() => setOpenAddModal(false)}
 //         fetchGuests={() => fetchGuests(page, pageSize, selectedWedding)}
 //       />
+
+//       <ModalCreateWedding
+//         open={openAddModal}
+//         onClose={() => setOpenAddModal(false)}
+//         fetchWeddings={() => fetchWeddings}
+//       />
+
 //       <Snackbar
 //         open={notification.open}
 //         autoHideDuration={6000}
@@ -256,50 +285,31 @@
 // };
 
 // export default Clients;
-import React, { useState, useEffect } from "react";
-import {
-  Typography,
-  Button,
-  Box,
-  Snackbar,
-  Alert,
-  Skeleton,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import Header from "../dashboard/components/Header";
-import { userAPI } from "../service/user"; // Gọi API từ AdminAPI
-import ModalConfirmDelete from "../dashboard/modal-clients/DeleteUser";
-import ModalAddUser from "../dashboard/modal-clients/CreateUser";
-
 const Clients = () => {
-  const [guests, setGuests] = useState([]); // Lưu danh sách khách mời
-  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
-  const [page, setPage] = useState(1); // Trang hiện tại
-  const [pageSize, setPageSize] = useState(20); // Số lượng bản ghi mỗi trang
-  const [totalGuests, setTotalGuests] = useState(0); // Tổng số khách mời
-  const [weddingList, setWeddingList] = useState([]); // Danh sách đám cưới
-  const [selectedWedding, setSelectedWedding] = useState(""); // Đám cưới đã chọn
-  const [openModal, setOpenModal] = useState(false); // Modal xác nhận xóa
-  const [guestToDelete, setGuestToDelete] = useState(null); // Khách mời muốn xóa
+  const [guests, setGuests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalGuests, setTotalGuests] = useState(0);
+  const [weddingList, setWeddingList] = useState([]);
+  const [selectedWedding, setSelectedWedding] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [guestToDelete, setGuestToDelete] = useState(null);
   const [notification, setNotification] = useState({
     open: false,
     severity: "success",
     message: "",
   });
-  const [openAddModal, setOpenAddModal] = useState(false); // Modal thêm khách mời
+  const [openAddUserModal, setOpenAddUserModal] = useState(false); // Modal thêm khách mời
+  const [openCreateWeddingModal, setOpenCreateWeddingModal] = useState(false); // Modal thêm đám cưới
 
   // Gọi API để lấy danh sách đám cưới
   const fetchWeddings = async () => {
     try {
-      const response = await userAPI.getAllWedding(); // Giả sử có API này
-      setWeddingList(response.data); // Lưu danh sách đám cưới
+      const token = Cookies.get("token");
+      const decoded = jwtDecode(token);
+      const response = await userAPI.getAllWedding(decoded.sub);
+      setWeddingList(response.data);
     } catch (error) {
       console.error("Error fetching weddings:", error);
     }
@@ -309,7 +319,7 @@ const Clients = () => {
   const fetchGuests = async (page, limit, weddingId) => {
     setLoading(true);
     try {
-      const response = await userAPI.getGuestList(limit, page, weddingId); // Gọi API với limit, page, weddingId
+      const response = await userAPI.getGuestList(limit, page, weddingId);
       const { guests, total } = response.data;
 
       setGuests(guests);
@@ -328,12 +338,12 @@ const Clients = () => {
 
   // Gọi API khi trang, số lượng bản ghi hoặc đám cưới thay đổi
   useEffect(() => {
-    fetchWeddings(); // Lấy danh sách đám cưới khi lần đầu tải
+    fetchWeddings();
   }, []);
 
   useEffect(() => {
     if (selectedWedding) {
-      fetchGuests(page, pageSize, selectedWedding); // Gọi API với weddingId
+      fetchGuests(page, pageSize, selectedWedding);
     }
   }, [selectedWedding, page, pageSize]);
 
@@ -422,7 +432,24 @@ const Clients = () => {
             alignSelf: "center",
           }}
           startIcon={<AddIcon />}
-          onClick={() => setOpenAddModal(true)}
+          onClick={() => setOpenCreateWeddingModal(true)} // Mở modal thêm đám cưới
+        >
+          Thêm đám cưới
+        </Button>
+        <Button
+          variant="text-container"
+          sx={{
+            minWidth: "fit-content",
+            backgroundColor: "hsl(345, 75%, 42%)",
+            color: "hsl(5, 90%, 95%)",
+            "&:hover": {
+              backgroundColor: "hsl(340, 80%, 38%)",
+              opacity: 0.8,
+            },
+            alignSelf: "center",
+          }}
+          startIcon={<AddIcon />}
+          onClick={() => setOpenAddUserModal(true)} // Mở modal thêm khách mời
         >
           Thêm khách mời
         </Button>
@@ -474,7 +501,7 @@ const Clients = () => {
             rowCount={totalGuests}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             onPageChange={(newPage) => setPage(newPage + 1)}
-            paginationMode="server" // Phân trang trên server
+            paginationMode="server"
             disableSelectionOnClick
           />
         )}
@@ -496,10 +523,17 @@ const Clients = () => {
       />
 
       <ModalAddUser
-        open={openAddModal}
-        onClose={() => setOpenAddModal(false)}
+        open={openAddUserModal}
+        onClose={() => setOpenAddUserModal(false)}
         fetchGuests={() => fetchGuests(page, pageSize, selectedWedding)}
       />
+
+      <ModalCreateWedding
+        open={openCreateWeddingModal}
+        onClose={() => setOpenCreateWeddingModal(false)}
+        fetchWeddings={() => fetchWeddings()}
+      />
+
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

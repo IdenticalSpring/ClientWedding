@@ -13,6 +13,8 @@ import {
   FormLabel,
 } from "@mui/material";
 import { userAPI } from "../../service/user";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
   const [formData, setFormData] = useState({
@@ -31,8 +33,10 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
   useEffect(() => {
     const fetchWeddings = async () => {
       try {
-        const response = await userAPI.getAllWedding(); // Gọi API để lấy danh sách weddings
-        setWeddings(response.data); // Lưu danh sách weddings vào state
+        const token = Cookies.get("token");
+        const decoded = jwtDecode(token);
+        const response = await userAPI.getAllWedding(decoded.sub); // Giả sử có API này
+        setWeddings(response.data); // Lưu danh sách đám cưới
       } catch (error) {
         console.error("Error fetching weddings:", error);
       }
@@ -167,8 +171,6 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
                 fullWidth
               >
                 <MenuItem value="Invited">Invited</MenuItem>
-                <MenuItem value="Accepted">Accepted</MenuItem>
-                <MenuItem value="Declined">Declined</MenuItem>
               </Select>
             </FormControl>
           </Grid>

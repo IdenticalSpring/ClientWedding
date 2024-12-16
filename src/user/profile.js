@@ -22,6 +22,7 @@ export default function Profile() {
     email: "",
     avatar: "",
   });
+  const [imageSrc, setImageSrc] = useState(""); // Đường dẫn ảnh
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -43,11 +44,12 @@ export default function Profile() {
 
   const fetchUserData = async () => {
     try {
-      const user = await userAPI.getUserById(); // Gọi API lấy thông tin người dùng
+      // const user = await userAPI.getInfoUser(); // Gọi API lấy thông tin người dùng
+      // console.log("user", user);
       setUserData({
-        name: user.name || "",
-        email: user.email || "",
-        avatar: user.avatar || "",
+        name: userData.name || "",
+        email: userData.email || "",
+        avatar: userData.avatar || "",
       });
     } catch (error) {
       console.error("Lỗi khi tải thông tin người dùng:", error);
@@ -62,17 +64,19 @@ export default function Profile() {
     }));
   };
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
+      try {
+        const uploadedImage = await userAPI.uploadImages(file);
+        setImageSrc(uploadedImage.data.url);
         setUserData((prev) => ({
           ...prev,
-          avatar: reader.result, // Hiển thị bản xem trước từ URL base64
+          avatar: uploadedImage.data.url,
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
   };
 
@@ -128,7 +132,8 @@ export default function Profile() {
             alt={userData.name}
             src={
               userData.avatar ||
-              "https://th.bing.com/th/id/OIP.kQyrx9VbuWXWxCVxoreXOgHaHN?w=179&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+              "https://th.bing.com/th/id/OIP.kQyrx9VbuWXWxCVxoreXOgHaHN?w=179&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" ||
+              imageSrc
             }
             sx={{ width: 120, height: 120, border: "2px solid #D81B60" }}
           />

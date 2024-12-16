@@ -23,7 +23,6 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
     relationship: "",
     status: "Invited",
     note: "",
-    tableNumber: "",
   });
 
   const [weddings, setWeddings] = useState([]); // State để lưu danh sách đám cưới
@@ -51,19 +50,11 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
   };
 
   const handleSubmit = async () => {
-    const {
-      weddingId,
-      name,
-      email,
-      phone,
-      relationship,
-      status,
-      note,
-      tableNumber,
-    } = formData;
+    const { weddingId, name, email, phone, relationship, status, note } =
+      formData;
 
     // Validate required fields
-    if (!weddingId || !name || !email || !phone) {
+    if (!weddingId || !name || !email || !phone || !relationship || !status) {
       alert("Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -82,7 +73,6 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
           relationship: "",
           status: "Invited",
           note: "",
-          tableNumber: "",
         });
       }
     } catch (error) {
@@ -190,19 +180,6 @@ const ModalAddGuest = ({ open, onClose, fetchGuests }) => {
                 value={formData.note}
                 onChange={handleChange}
                 placeholder="Ghi chú thêm (nếu có)"
-                fullWidth
-              />
-            </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <FormLabel>Số bàn</FormLabel>
-              <TextField
-                type="number"
-                name="tableNumber"
-                value={formData.tableNumber}
-                onChange={handleChange}
-                placeholder="Số bàn của khách mời"
                 fullWidth
               />
             </FormControl>

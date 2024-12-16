@@ -20,6 +20,8 @@ import {
 import Header from "../dashboard/components/Header";
 import { userAPI } from "../service/user";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const WebsiteManagement = () => {
   const navigate = useNavigate();
@@ -32,8 +34,14 @@ const WebsiteManagement = () => {
 
   useEffect(() => {
     const fetchTemplates = async () => {
+      const token = Cookies.get("token");
+      const decoded = jwtDecode(token);
       try {
-        const response = await userAPI.getAllTemplateById(1, page, rowsPerPage);
+        const response = await userAPI.getAllTemplateById(
+          decoded.sub,
+          page,
+          rowsPerPage
+        );
         if (response?.status === 200 || response?.status === 201) {
           setTemplates(response?.data?.data);
           setTotalCount(response?.data?.total || 0);
@@ -60,8 +68,10 @@ const WebsiteManagement = () => {
     alert(`Chi tiết về template: ${template.name}`);
     console.log(template?.brideName);
     console.log(template?.groomName);
-    
-    navigate(`/view/${template?.id}/${template?.brideName}/${template?.groomName}`);
+
+    navigate(
+      `/view/${template?.id}/${template?.brideName}/${template?.groomName}`
+    );
   };
 
   const handleChangePage = (event, newPage) => {

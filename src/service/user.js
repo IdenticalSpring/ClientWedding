@@ -67,9 +67,9 @@ export const userAPI = {
       throw error;
     }
   },
-  getGuestList: async (limit = 20, page = 1, weddingId = "") => {
+  getGuestList: async (limit = 10, page = 1, weddingId = "") => {
     try {
-      const response = await requestNoTK.get(`/guest-list`, {
+      const response = await request.get(`/guest-list`, {
         params: {
           limit,
           page,
@@ -88,7 +88,7 @@ export const userAPI = {
 
   addGuest: async (guestData) => {
     try {
-      const response = await requestNoTK.post(`/guest-list`, guestData);
+      const response = await request.post(`/guest-list`, guestData);
       return response.data;
     } catch (error) {
       console.error(
@@ -98,13 +98,15 @@ export const userAPI = {
       throw error;
     }
   },
-  getAllWedding: async (guestData) => {
+  getAllWedding: async (userId) => {
     try {
-      const response = await requestNoTK.get(`/wedding-details`, guestData);
+      const response = await request.get(`/wedding-details`, {
+        params: { userId }, // Truyền userId vào query string
+      });
       return response.data;
     } catch (error) {
       console.error(
-        "Error adding guest:",
+        "Error fetching weddings:",
         error.response?.data || error.message
       );
       throw error;
@@ -113,7 +115,7 @@ export const userAPI = {
 
   addEvents: async (eventData) => {
     try {
-      const response = await requestNoTK.post(`/event-details`, eventData);
+      const response = await request.post(`/event-details`, eventData);
       return response.data;
     } catch (error) {
       console.error(
@@ -125,7 +127,7 @@ export const userAPI = {
   },
   getAllEvents: async (eventData) => {
     try {
-      const response = await requestNoTK.get(`/event-details`, eventData);
+      const response = await request.get(`/event-details`, eventData);
       return response.data;
     } catch (error) {
       console.error(
@@ -138,18 +140,26 @@ export const userAPI = {
 
   getEventsByWeddingId: async (weddingId) => {
     try {
-      const response = await requestNoTK.get(
-        `/event-details/wedding/${weddingId}`
-      );
+      const response = await request.get(`/event-details/wedding/${weddingId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching events by weddingId:", error);
       throw error;
     }
   },
+  getInfoUser: async () => {
+    try {
+      const response = await request.get(`/auth/profile`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user information:", error);
+      throw error;
+    }
+  },
+
   updateUser: async (userId, userData) => {
     try {
-      const response = await requestNoTK.put(`/users/${userId}`, userData);
+      const response = await request.put(`/users/${userId}`, userData);
       return response.data;
     } catch (error) {
       console.error(
@@ -157,6 +167,22 @@ export const userAPI = {
         error.response?.data || error.message
       );
       throw error;
+    }
+  },
+
+  uploadImages: async (image) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", image);
+      const response = await request.post("/images/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating image:", error);
+      throw error.response?.data || { message: "Failed to create image" };
     }
   },
   getAllTemplates: async (page, limit) => {
@@ -228,7 +254,18 @@ export const userAPI = {
     }
   },
   getAllTemplateById: async (id, page, limit) => {
-    const response = await request.get(`/templates_user?userId=${id}&page=${page}&limit=${limit}`);
+    const response = await request.get(
+      `/templates_user?userId=${id}&page=${page}&limit=${limit}`
+    );
     return response.data;
+  },
+  createWedding: async (wedding) => {
+    try {
+      const response = await request.post(`/wedding-details`, wedding);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding wedding:", error);
+      throw error.response?.data || { message: "Failed to add wedding" };
+    }
   },
 };

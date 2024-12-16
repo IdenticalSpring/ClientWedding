@@ -47,7 +47,6 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
     boxShadow: theme.shadows[3],
     minWidth: "150px",
     backgroundColor: theme.palette.background.paper,
-    padding: "4px 0",
   },
 }));
 
@@ -122,7 +121,7 @@ export default function AppAppBar() {
 
   return (
     <AppBar
-      position="fixed"
+      position="absolute"
       enableColorOnDark
       sx={{
         boxShadow: 0,

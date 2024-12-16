@@ -182,7 +182,7 @@ export default function AppAppBar() {
                 color="info"
                 size="small"
                 sx={{ minWidth: 0 }}
-                onClick={() => handleScrollToSection("faq")}
+                onClick={() => handleScrollToSection("pricing")}
               >
                 Bảng giá
               </Button>

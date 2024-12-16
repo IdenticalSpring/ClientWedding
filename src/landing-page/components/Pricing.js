@@ -9,7 +9,6 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
-
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
@@ -18,41 +17,31 @@ const tiers = [
     title: 'Free',
     price: '0',
     description: [
-      '10 users included',
-      '2 GB of storage',
-      'Help center access',
-      'Email support',
+      'Trải nghiệm tiêu chuẩn',
     ],
-    buttonText: 'Sign up for free',
+    buttonText: 'Xem chi tiết',
     buttonVariant: 'outlined',
     buttonColor: 'primary',
   },
   {
-    title: 'Professional',
+    title: 'Vip',
     subheader: 'Recommended',
     price: '15',
     description: [
-      '20 users included',
-      '10 GB of storage',
-      'Help center access',
-      'Priority email support',
-      'Dedicated team',
-      'Best deals',
+      'Trải nghiệm nâng cao',
+      'Tùy chỉnh màu sắc',
     ],
-    buttonText: 'Start now',
+    buttonText: 'Xem chi tiết',
     buttonVariant: 'contained',
     buttonColor: 'secondary',
   },
   {
-    title: 'Enterprise',
+    title: 'Cơ bản',
     price: '30',
     description: [
-      '50 users included',
-      '30 GB of storage',
-      'Help center access',
-      'Phone & email support',
+      'Trải nghiệm vượt trội',
     ],
-    buttonText: 'Contact us',
+    buttonText: 'Xem chi tiết',
     buttonVariant: 'outlined',
     buttonColor: 'primary',
   },
@@ -100,7 +89,7 @@ export default function Pricing() {
       >
         {tiers.map((tier) => (
           <Grid
-            size={{ xs: 12, sm: tier.title === 'Enterprise' ? 12 : 6, md: 4 }}
+            size={{ xs: 12, sm: tier.title === 'Cơ bản' ? 12 : 6, md: 4 }}
             key={tier.title}
           >
             <Card
@@ -111,7 +100,7 @@ export default function Pricing() {
                   flexDirection: 'column',
                   gap: 4,
                 },
-                tier.title === 'Professional' &&
+                tier.title === 'Vip' &&
                   ((theme) => ({
                     border: 'none',
                     background:
@@ -135,7 +124,7 @@ export default function Pricing() {
                       alignItems: 'center',
                       gap: 2,
                     },
-                    tier.title === 'Professional'
+                    tier.title === 'Vip'
                       ? { color: 'grey.100' }
                       : { color: '' },
                   ]}
@@ -143,7 +132,7 @@ export default function Pricing() {
                   <Typography component="h3" variant="h6">
                     {tier.title}
                   </Typography>
-                  {tier.title === 'Professional' && (
+                  {tier.title === 'Vip' && (
                     <Chip icon={<AutoAwesomeIcon />} label={tier.subheader} />
                   )}
                 </Box>
@@ -153,17 +142,17 @@ export default function Pricing() {
                       display: 'flex',
                       alignItems: 'baseline',
                     },
-                    tier.title === 'Professional'
+                    tier.title === 'Vip'
                       ? { color: 'grey.50' }
                       : { color: null },
                   ]}
                 >
                   <Typography component="h3" variant="h2">
-                    ${tier.price}
+                    {tier.price} VND
                   </Typography>
-                  <Typography component="h3" variant="h6">
+                  {/* <Typography component="h3" variant="h6">
                     &nbsp; per month
-                  </Typography>
+                  </Typography> */}
                 </Box>
                 <Divider sx={{ my: 2, opacity: 0.8, borderColor: 'divider' }} />
                 {tier.description.map((line) => (
@@ -176,7 +165,7 @@ export default function Pricing() {
                         {
                           width: 20,
                         },
-                        tier.title === 'Professional'
+                        tier.title === 'Vip'
                           ? { color: 'primary.light' }
                           : { color: 'primary.main' },
                       ]}
@@ -185,7 +174,7 @@ export default function Pricing() {
                       variant="subtitle2"
                       component={'span'}
                       sx={[
-                        tier.title === 'Professional'
+                        tier.title === 'Vip'
                           ? { color: 'grey.50' }
                           : { color: null },
                       ]}

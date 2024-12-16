@@ -19,6 +19,7 @@ import { ArrowBack, Visibility, Save } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
+import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
 
 const EditTemplate = () => {
@@ -84,6 +85,7 @@ const EditTemplate = () => {
   };
 
   const handleStyleChange = (key, value) => {
+    console.log("Handle style change:", key, value);
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -113,6 +115,8 @@ const EditTemplate = () => {
   };
 
   const handleTextChange = (value) => {
+    console.log("🚀 ~ handleTextChange ~ value:", value)
+    
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -310,8 +314,8 @@ const EditTemplate = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", flexDirection: "column" }}>
-      <AppBar position="static" color="primary">
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <AppBar position="static" color="primary" sx={{zIndex: 1, height: "60px"}}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
             <ArrowBack />
@@ -338,7 +342,7 @@ const EditTemplate = () => {
         </Toolbar>
       </AppBar>
 
-      <Box ref={sectionRef} sx={{ display: "flex", flex: 1 }}>
+      <Box ref={sectionRef} sx={{ display: "flex", flex: 1, alignItems: "center" }}>
         <Box
           sx={{
             width: "250px",
@@ -353,120 +357,46 @@ const EditTemplate = () => {
           />
         </Box>
 
-        <Box
-          sx={{
-            flex: 1,
-            padding: 2,
-            maxWidth: "100%",
-            boxSizing: "border-box",
-          }}
-        >
-          {selectedSection ? (
-            <Box
-              sx={{
-                position: "relative",
-                border: "1px dashed #ccc",
-                padding: 2,
-                minHeight: selectedSection.metadata.style.minHeight,
-                width: "100%",
-                backgroundColor: "#f9f9f9",
-                boxSizing: "border-box",
-                overflow: "hidden",
-              }}
-            >
-              {selectedSection.metadata?.components?.map((component) => {
-                const updatedComponent = template.sections
-                  .find((section) => section.id === selectedSection.id)
-                  ?.metadata.components.find(
-                    (comp) => comp.id === component.id
-                  );
+        {selectedSection ? (
+          <Box
+            sx={{
+              position: "relative",
+              border: "1px dashed #ccc",
+              padding: 2,
+              minHeight: selectedSection.metadata.style.minHeight,
+              minWidth: selectedSection?.metadata?.style?.minWidth,
+              backgroundColor: "#f9f9f9",
+              boxSizing: "border-box",
+              overflow: "hidden",
+              marginLeft: 2
+            }}
+          >
+            {selectedSection.metadata?.components?.map((component) => {
+              const updatedComponent = template.sections
+                .find((section) => section.id === selectedSection.id)
+                ?.metadata.components.find((comp) => comp.id === component.id);
 
-                return (
-                  <RenderComponent
-                    key={component.id}
-                    component={updatedComponent || component}
-                    sectionRef={sectionRef}
-                    onClick={handleComponentClick}
-                  />
-                );
-              })}
-              {selectedComponent && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    width: "300px",
-                    background: "#fff",
-                    padding: 2,
-                    borderLeft: "1px solid #ccc",
-                  }}
-                >
-                  <h3>Edit Component</h3>
-                  {selectedComponent.type === "text" && (
-                    <>
-                      <TextField
-                        label="Text"
-                        value={selectedComponent.text || ""}
-                        onChange={(e) => handleTextChange(e.target.value)}
-                        fullWidth
-                        sx={{ mb: 2 }}
-                      />
-                      <TextField
-                        type="color"
-                        label="Font Color"
-                        value={selectedComponent.style.color || "#000000"}
-                        onChange={(e) =>
-                          handleStyleChange("color", e.target.value)
-                        }
-                        fullWidth
-                        sx={{ mb: 2 }}
-                      />
-                      <Slider
-                        value={selectedComponent.style.fontSize || 16}
-                        onChange={(e, value) =>
-                          handleStyleChange("fontSize", value)
-                        }
-                        min={10}
-                        max={72}
-                        step={1}
-                        sx={{ mb: 2 }}
-                      />
-                      <Select
-                        value={selectedComponent.style.fontFamily || "Arial"}
-                        onChange={(e) =>
-                          handleStyleChange("fontFamily", e.target.value)
-                        }
-                        fullWidth
-                        sx={{ mb: 2 }}
-                      >
-                        <MenuItem value="Arial">Arial</MenuItem>
-                        <MenuItem value="Courier New">Courier New</MenuItem>
-                        <MenuItem value="Georgia">Georgia</MenuItem>
-                        <MenuItem value="Times New Roman">
-                          Times New Roman
-                        </MenuItem>
-                        <MenuItem value="Verdana">Verdana</MenuItem>
-                      </Select>
-                    </>
-                  )}
-
-                  {selectedComponent.type === "image" && (
-                    <TextField
-                      type="file"
-                      onChange={handleFileUpload}
-                      fullWidth
-                      sx={{ mb: 2 }}
-                    />
-                  )}
-                </Box>
-              )}
-            </Box>
-          ) : (
-            <Typography>Select a section to edit.</Typography>
-          )}
-        </Box>
+              return (
+                <RenderComponent
+                  key={component.id}
+                  component={updatedComponent || component}
+                  sectionRef={sectionRef}
+                  onClick={handleComponentClick}
+                />
+              );
+            })}
+          </Box>
+        ) : (
+          <Typography>Select a section to edit.</Typography>
+        )}
+        <SidebarRight
+          selectedComponent={selectedComponent}
+          handleTextChange={handleTextChange}
+          handleStyleChange={handleStyleChange}
+          handleFileUpload={handleFileUpload}
+        />
       </Box>
+
       {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
         <TextField

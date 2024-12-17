@@ -17,7 +17,8 @@ import ForgotPassword from "./ForgotPasword";
 import { GoogleIcon, FacebookIcon } from "./CustomIcons";
 import AppTheme from "../components/shared-theme/AppTheme";
 import ColorModeSelect from "../components/shared-theme/ColorModeSelect";
-import { loginUser } from "../service/auth"; 
+import { loginUser } from "../service/auth";
+import { jwtDecode } from "jwt-decode";  // Correct import
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -95,9 +96,19 @@ export default function SignIn(props) {
       const result = await loginUser(payload);
 
       if (result.success) {
-        const token = result.data.access_token; 
-        sessionStorage.setItem("access_token", token); 
-        window.location.href = "/"; 
+        const token = result.data.access_token;
+
+        // Decode the JWT to get the user information
+        const decodedToken = jwtDecode(token);  // Use jwtDecode here
+
+        // Extract the userId from the decoded token
+        const userId = decodedToken.sub;
+        const planId = decodedToken.planId;
+        // Store both the token and userId in sessionStorage
+        sessionStorage.setItem("access_token", token);
+        sessionStorage.setItem("userId", userId);  // Save userId separately
+        sessionStorage.setItem("planId", planId); 
+        window.location.href = "/";  // Redirect to the homepage or desired location
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -243,16 +254,6 @@ export default function SignIn(props) {
             >
               Đăng nhập với Facebook
             </Button>
-            <Typography sx={{ textAlign: "center" }}>
-              Bạn chưa có tài khoản?{" "}
-              <Link
-                href="/dangky/"
-                variant="body2"
-                sx={{ alignSelf: "center" }}
-              >
-                Đăng ký
-              </Link>
-            </Typography>
           </Box>
         </Card>
       </SignInContainer>

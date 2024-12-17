@@ -268,4 +268,48 @@ export const userAPI = {
       throw error.response?.data || { message: "Failed to add wedding" };
     }
   },
+  fetchPlans: async () => {
+    try {
+      const response = await request.get(`/subscription-plans`);
+      return response.data.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+  createSubscription: async (userId, planId, confirmChange = false) => {
+    try {
+      // Kiểm tra userId có phải là số nguyên dương không
+      if (!Number.isInteger(userId) || userId <= 0) {
+        throw new Error('User ID must be a positive integer');
+      }
+
+      const response = await request.post(`/subscriptions/create`, {
+        userId,
+        planId,
+        confirmChange,
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response.data?.message || 'Something went wrong';
+        throw new Error(message);
+      } else if (error.request) {
+        throw new Error('No response received from server. Please try again.');
+      } else {
+        throw new Error(`Request Error: ${error.message}`);
+      }
+    }
+  },
+  updateSubscriptionStatus: async (orderCode, success) => {
+    try {
+      const response = await request.patch(`/subscriptions/update-status`, {
+        orderCode,
+        success,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating subscription status:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 };

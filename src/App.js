@@ -15,6 +15,9 @@ import TemplatePage from "./user/template/TemplatePage";
 import TemplateDetail from "./user/template/TemplateDetail";
 import EditTemplate from "./user/template/edit/EditTemplate";
 import ViewTemplate from "./user/template/edit/ViewTemplate";
+import PaymentSuccess from "./landing-page/components/PaymentStatusToast";
+import { ToastContainer } from "react-toastify";
+import PaymentStatusToast from "./landing-page/components/PaymentStatusToast";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -115,6 +118,8 @@ function App() {
           element={<ViewTemplate />}
         />
       </Routes>
+      <PaymentStatusToast /> 
+      <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
     </Router>
   );
 }

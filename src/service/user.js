@@ -312,4 +312,22 @@ export const userAPI = {
       throw error;
     }
   },
+  updateSubscriptionStatus: async ({ orderCode, success }) => {
+    try {
+      // Đảm bảo set đúng headers và body
+      const response = await request.patch(
+        '/subscriptions/update-status',
+        { orderCode, success },
+        {
+          headers: {
+            'Content-Type': 'application/json', 
+          },
+        }
+      );
+      return response.data; 
+    } catch (error) {
+      console.error('Error updating subscription status:', error.response?.data || error.message);
+      throw error.response?.data || error.message;
+    }
+  },
 };

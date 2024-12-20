@@ -285,18 +285,26 @@ export default function Pricing() {
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <Button fullWidth variant="contained" sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'primary.dark',
-                    },
-                  }} onClick={() => handleSubscribeClick(plan.id)}>
-                    Subscribe
-                  </Button>
+                  {plan.name !== 'Free' && (
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                        },
+                      }}
+                      onClick={() => handleSubscribeClick(plan.id)}
+                    >
+                      Subscribe
+                    </Button>
+                  )}
                 </CardActions>
               </Card>
             </Grid>
+
           );
         })}
       </Grid>

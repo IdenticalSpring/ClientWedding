@@ -10,6 +10,12 @@ const PaymentStatusToast = () => {
     const hasProcessed = useRef(false); // Sử dụng useRef để kiểm tra trạng thái đã xử lý
 
     useEffect(() => {
+        // Kiểm tra nếu pathname không phải là "/payment-status"
+        if (location.pathname !== '/payment-status') {
+            console.log('Not on /payment-status, skipping');
+            return;
+        }
+
         if (hasProcessed.current) {
             console.log('Already processed, skipping');
             return; // Nếu đã xử lý thì không thực hiện gì nữa
@@ -54,8 +60,10 @@ const PaymentStatusToast = () => {
                 // Kiểm tra phản hồi từ API
                 if (response.status === 200) {
                     if (success) {
+                        setMessage('Bạn đã mua gói thành công.');
                         toast.success('Bạn đã mua gói thành công.', { toastId: 'payment-success' });
                     } else {
+                        setMessage('Bạn đã hủy gói.');
                         toast.warn('Bạn đã hủy gói.', { toastId: 'payment-cancelled' });
                     }
                 } else {
@@ -72,7 +80,7 @@ const PaymentStatusToast = () => {
         };
 
         handlePaymentStatus();
-    }, [location.search]); // Chỉ theo dõi sự thay đổi của query string
+    }, [location.pathname, location.search]); // Theo dõi sự thay đổi của pathname và query string
 
     return (
         <div style={{ marginTop: '20px', textAlign: 'center' }}>

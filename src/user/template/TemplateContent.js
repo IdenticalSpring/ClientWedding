@@ -3,7 +3,7 @@ import { userAPI } from "../../service/user";
 import { Box, Typography, CircularProgress, Button, Pagination } from "@mui/material";
 import { Star } from '@mui/icons-material';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate from React Router
+import { useNavigate } from 'react-router-dom';
 
 // Styled Components
 const Wrapper = styled.div`
@@ -82,7 +82,7 @@ const TemplateName = styled(Typography)`
   font-size: 1.2rem;
   margin-bottom: 10px;
   font-weight: 600;
-  color: #1976d2; /* Màu xanh dương */
+  color: #1976d2;
 `;
 
 const TemplateDescription = styled(Typography)`
@@ -100,7 +100,7 @@ const ButtonContainer = styled(Box)`
 
 const AddButton = styled(Button)`
   text-transform: none;
-  background-color: #4caf50; /* Màu xanh lá */
+  background-color: #4caf50;
   margin-right: 10px;
   &:hover {
     background-color: #45a049;
@@ -123,7 +123,7 @@ const TemplateContent = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [limit] = useState(20);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -148,11 +148,11 @@ const TemplateContent = () => {
     };
 
     const handlePreview = (templateId) => {
-        navigate(`/template/${templateId}`); 
+        navigate(`/template/${templateId}`);
     };
 
     const handleTryNow = (templateId) => {
-        navigate(`/template/edit/${templateId}`); 
+        navigate(`/template/edit/${templateId}`);
     };
 
     if (loading) {
@@ -178,17 +178,15 @@ const TemplateContent = () => {
             <TemplateContainer>
                 {templates.map((template) => (
                     <TemplateCard key={template.id}>
-                        {template.accessType === "VIP" && (
+                        {template.subscriptionPlan?.name === "Free" ? (
+                            <FreeIndicator>FREE</FreeIndicator>
+                        ) : (
                             <VIPIndicator>
                                 <Star sx={{ marginRight: "5px", fontSize: "20px" }} />
                                 <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                                    VIP
+                                    {template.subscriptionPlan?.name?.toUpperCase()}
                                 </Typography>
                             </VIPIndicator>
-                        )}
-
-                        {template.accessType === "FREE" && (
-                            <FreeIndicator>FREE</FreeIndicator>
                         )}
 
                         <TemplateImage src={template.thumbnailUrl} alt={template.name} />
@@ -204,14 +202,14 @@ const TemplateContent = () => {
                             <ButtonContainer>
                                 <AddButton
                                     variant="contained"
-                                    onClick={() => handlePreview(template.id)} 
+                                    onClick={() => handlePreview(template.id)}
                                 >
                                     Xem trước
                                 </AddButton>
                                 <StyledButton
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => handleTryNow(template.id)} 
+                                    onClick={() => handleTryNow(template.id)}
                                 >
                                     Thử ngay
                                 </StyledButton>
@@ -220,6 +218,7 @@ const TemplateContent = () => {
                     </TemplateCard>
                 ))}
             </TemplateContainer>
+
 
             <Box sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
                 <Pagination

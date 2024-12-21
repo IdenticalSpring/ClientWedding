@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import SignUp from "./sign-up/SignUp";
 import SignIn from "./sign-in/SignIn";
 import LandingPage from "./landing-page/LandingPage";
 import DashboardLayout from "./dashboard/Dashboard";
 import GuestList from "./dashboard/Clients";
 import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
-import Event from "./dashboard/Event";
 import WebsiteManagement from "./dashboard/WebsiteManagement";
 import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
@@ -18,6 +22,7 @@ import ViewTemplate from "./user/template/edit/ViewTemplate";
 import PaymentSuccess from "./landing-page/components/PaymentStatusToast";
 import { ToastContainer } from "react-toastify";
 import PaymentStatusToast from "./landing-page/components/PaymentStatusToast";
+import WeddingList from "./dashboard/Wedding";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -88,8 +93,7 @@ function App() {
               isAuthenticated={isAuthenticated}
               element={
                 <DashboardLayout>
-                  <Calendar />
-                  <Event />
+                  <WeddingList />
                 </DashboardLayout>
               }
             />
@@ -118,8 +122,12 @@ function App() {
           element={<ViewTemplate />}
         />
       </Routes>
-      <PaymentStatusToast /> 
-      <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
+      <PaymentStatusToast />
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={true}
+      />
     </Router>
   );
 }

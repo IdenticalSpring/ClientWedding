@@ -98,6 +98,18 @@ export const userAPI = {
       throw error;
     }
   },
+  deleteGuest: async (guestId) => {
+    try {
+      const response = await request.delete(`/guest-list/${guestId}`);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error deleting guest:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
   getAllWedding: async (userId) => {
     try {
       const response = await request.get(`/wedding-details`, {

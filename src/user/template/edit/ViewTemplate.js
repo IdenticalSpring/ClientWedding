@@ -64,6 +64,10 @@ const ViewTemplate = () => {
     );
   }
 
+  const sortedSections = template?.section_user
+    ?.slice()
+    .sort((a, b) => a.position - b.position);
+
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h4" gutterBottom>
@@ -81,7 +85,7 @@ const ViewTemplate = () => {
           alignItems: "center",
         }}
       >
-        {template?.section_user?.map((section, index) => (
+        {sortedSections.map((section, index) => (
           <Box
             key={index}
             sx={{
@@ -136,8 +140,6 @@ const ViewTemplate = () => {
                 {component.type === "circle" && (
                   <Box
                     sx={{
-                      // width: component.style?.size || 50,
-                      // height: component.style?.size || 50,
                       borderRadius: "50%",
                       backgroundColor: component.style?.fillColor,
                       position: "absolute",

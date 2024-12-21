@@ -11,13 +11,10 @@ import {
   Snackbar,
   Alert,
   TextField,
-  Slider,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
@@ -35,9 +32,6 @@ const EditTemplate = () => {
   const [groomName, setGroomName] = useState("");
   const [nameError, setNameError] = useState(false);
 
-  const handleBrideNameChange = (e) => setBrideName(e.target.value);
-  const handleGroomNameChange = (e) => setGroomName(e.target.value);
-
   const sectionRef = useRef(null);
   const handleComponentClick = (component) => {
     setSelectedComponent(component);
@@ -53,14 +47,23 @@ const EditTemplate = () => {
     setSnackbar({ open: true, message, severity });
   };
 
+  const sortSectionsByPosition = (sections) => {
+    return [...sections].sort((a, b) => {
+      const positionA = parseInt(a.position, 10);
+      const positionB = parseInt(b.position, 10);
+      return positionA - positionB; // Sắp xếp tăng dần theo position
+    });
+  };
+
   useEffect(() => {
     const token = Cookies.get("token");
     const fetchTemplate = async () => {
       try {
         const response = await userAPI.getTemplateById(id);
-        setTemplate(response.data);
-        if (response.data.sections && response.data.sections.length > 0) {
-          setSelectedSection(response.data.sections[0]);
+        const sortedSections = sortSectionsByPosition(response.data.sections || []);
+        setTemplate({ ...response.data, sections: sortedSections });
+        if (sortedSections.length > 0) {
+          setSelectedSection(sortedSections[0]);
         }
       } catch (error) {
         console.error("Error fetching template:", error);
@@ -80,12 +83,12 @@ const EditTemplate = () => {
     fetchTemplate();
   }, [id]);
 
-  const handleView = () => {
-    setIsPreview((prev) => !prev);
-  };
+  const handleBrideNameChange = (e) => setBrideName(e.target.value);
+  const handleGroomNameChange = (e) => setGroomName(e.target.value);
+
+  const handleView = () => setIsPreview((prev) => !prev);
 
   const handleStyleChange = (key, value) => {
-    console.log("Handle style change:", key, value);
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -98,30 +101,19 @@ const EditTemplate = () => {
           ...section.metadata,
           components: section.metadata.components.map((comp) =>
             comp.id === selectedComponent.id
-              ? {
-                  ...comp,
-                  style: { ...comp.style, [key]: value },
-                }
+              ? { ...comp, style: { ...comp.style, [key]: value } }
               : comp
           ),
         },
       }));
 
-      setTemplate((prev) => ({
-        ...prev,
-        sections: updatedSections,
-      }));
+      setTemplate((prev) => ({ ...prev, sections: updatedSections }));
     }
   };
 
   const handleTextChange = (value) => {
-    console.log("🚀 ~ handleTextChange ~ value:", value)
-    
     if (selectedComponent) {
-      setSelectedComponent((prev) => ({
-        ...prev,
-        text: value,
-      }));
+      setSelectedComponent((prev) => ({ ...prev, text: value }));
 
       const updatedSections = template.sections.map((section) => ({
         ...section,
@@ -133,10 +125,7 @@ const EditTemplate = () => {
         },
       }));
 
-      setTemplate((prev) => ({
-        ...prev,
-        sections: updatedSections,
-      }));
+      setTemplate((prev) => ({ ...prev, sections: updatedSections }));
     }
   };
 
@@ -146,13 +135,9 @@ const EditTemplate = () => {
       try {
         const imageData = await userAPI.uploadImages(file);
         const imageURL = imageData.data.url;
-        // Cập nhật src trong selectedComponent
-        setSelectedComponent((prev) => ({
-          ...prev,
-          src: imageURL,
-        }));
 
-        // Cập nhật src trong template.sections
+        setSelectedComponent((prev) => ({ ...prev, src: imageURL }));
+
         const updatedSections = template.sections.map((section) => {
           if (section.id === selectedSection.id) {
             return {
@@ -170,10 +155,7 @@ const EditTemplate = () => {
           return section;
         });
 
-        setTemplate((prev) => ({
-          ...prev,
-          sections: updatedSections,
-        }));
+        setTemplate((prev) => ({ ...prev, sections: updatedSections }));
 
         showSnackbar("Upload ảnh thành công!", "success");
       } catch (error) {
@@ -184,7 +166,6 @@ const EditTemplate = () => {
   };
 
   const handleSave = async () => {
-    // Kiểm tra nếu tên cô dâu và chú rể không rỗng
     if (!brideName || !groomName) {
       setNameError(true);
       showSnackbar("Vui lòng nhập tên cô dâu và chú rể!", "error");
@@ -200,9 +181,7 @@ const EditTemplate = () => {
       );
       const templateID = savedTemplate.data?.id;
 
-      if (!templateID) {
-        throw new Error("Không thể lấy được templateId!");
-      }
+      if (!templateID) throw new Error("Không thể lấy được templateId!");
 
       const sectionsWithMetadata = template.sections.map((section) => ({
         template_userId: templateID,
@@ -216,24 +195,18 @@ const EditTemplate = () => {
         await userAPI.createSectionUser(section);
       }
 
-      // Cập nhật URL với tên cô dâu và chú rể
       const encodedBrideName = encodeURIComponent(brideName);
       const encodedGroomName = encodeURIComponent(groomName);
-      // const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
-      // Sử dụng navigate để chuyển tới trang view
       navigate(`/view/${templateID}/${encodedBrideName}/${encodedGroomName}`);
     } catch (error) {
       console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");
     }
   };
-  const handleBack = () => {
-    navigate(-1);
-  };
 
-  const handleSectionClick = (section) => {
-    setSelectedSection(section);
-  };
+  const handleBack = () => navigate(-1);
+
+  const handleSectionClick = (section) => setSelectedSection(section);
 
   if (loading) {
     return (
@@ -265,6 +238,8 @@ const EditTemplate = () => {
     );
   }
 
+  const sortedSections = sortSectionsByPosition(template.sections || []);
+
   if (isPreview) {
     return (
       <Box
@@ -274,15 +249,15 @@ const EditTemplate = () => {
           alignItems: "center",
         }}
       >
-        {template.sections.map((section, index) => (
+        {sortedSections.map((section, index) => (
           <Box
             key={index}
             sx={{
               position: "relative",
               border: "1px solid #ccc",
               padding: 2,
-              minHeight: section.metadata.style.minHeight,
-              minWidth: section?.metadata?.style?.minWidth,
+              minHeight: section?.metadata?.style?.minHeight || "500px",
+              minWidth: section?.metadata?.style?.minWidth || "800px",
               boxSizing: "border-box",
               overflow: "hidden",
               marginBottom: 2,
@@ -315,30 +290,18 @@ const EditTemplate = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <AppBar position="static" color="primary" sx={{zIndex: 1, height: "60px"}}>
+      <AppBar position="static" color="primary" sx={{ zIndex: 1, height: "60px" }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
             <ArrowBack />
           </IconButton>
           <Box sx={{ flexGrow: 1 }} />
-          <Button
-            color="inherit"
-            startIcon={<Visibility />}
-            onClick={handleView}
-            sx={{ marginRight: 1 }}
-          >
+          <Button color="inherit" startIcon={<Visibility />} onClick={handleView}>
             {isPreview ? "Thoát xem" : "Xem"}
           </Button>
           <Button color="inherit" startIcon={<Save />} onClick={handleSave}>
             Lưu
           </Button>
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-          >
-            <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
-          </Snackbar>
         </Toolbar>
       </AppBar>
 
@@ -352,7 +315,7 @@ const EditTemplate = () => {
           }}
         >
           <SidebarContent
-            template={template}
+            template={{ ...template, sections: sortedSections }}
             onSectionClick={handleSectionClick}
           />
         </Box>
@@ -363,16 +326,16 @@ const EditTemplate = () => {
               position: "relative",
               border: "1px dashed #ccc",
               padding: 2,
-              minHeight: selectedSection.metadata.style.minHeight,
-              minWidth: selectedSection?.metadata?.style?.minWidth,
+              minHeight: selectedSection?.metadata?.style?.minHeight || "500px",
+              minWidth: selectedSection?.metadata?.style?.minWidth || "800px",
               backgroundColor: "#f9f9f9",
               boxSizing: "border-box",
               overflow: "hidden",
-              marginLeft: 2
+              marginLeft: 2,
             }}
           >
             {selectedSection.metadata?.components?.map((component) => {
-              const updatedComponent = template.sections
+              const updatedComponent = sortedSections
                 .find((section) => section.id === selectedSection.id)
                 ?.metadata.components.find((comp) => comp.id === component.id);
 
@@ -397,7 +360,6 @@ const EditTemplate = () => {
         />
       </Box>
 
-      {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
         <TextField
           label="Tên cô dâu"
@@ -405,9 +367,7 @@ const EditTemplate = () => {
           onChange={handleBrideNameChange}
           fullWidth
           error={nameError && !brideName}
-          helperText={
-            nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""
-          }
+          helperText={nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""}
           sx={{ mb: 2 }}
         />
         <TextField
@@ -416,9 +376,7 @@ const EditTemplate = () => {
           onChange={handleGroomNameChange}
           fullWidth
           error={nameError && !groomName}
-          helperText={
-            nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""
-          }
+          helperText={nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""}
           sx={{ mb: 2 }}
         />
       </Box>

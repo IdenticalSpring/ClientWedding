@@ -191,23 +191,26 @@ const TemplateDetail = (props) => {
         <Grid spacing={2}>
           <Grid item xs={12}>
             {template.sections && template.sections.length > 0 ? (
-              template.sections.map((section) => (
-                <Box
-                  key={section.id}
-                  sx={{
-                    position: "relative",
-                    border: "1px dashed #ccc",
-                    padding: 2,
-                    minHeight: section?.metadata?.style?.minHeight,
-                    width: section?.metadata?.style?.minWidth,
-                    marginBottom: 2,
-                    backgroundColor: "#f9f9f9",
-                    overflow: "hidden",
-                  }}
-                >
-                  {section.metadata?.components?.map(renderComponent)}
-                </Box>
-              ))
+              [...template.sections]
+                .sort((a, b) => parseInt(a.position) - parseInt(b.position))
+                .map((section) => (
+                  <Box
+                    key={section.id}
+                    sx={{
+                      position: section.metadata?.style.position,
+                      border: section.metadata?.style.border,
+                      padding: section.metadata?.style.padding,
+                      minHeight: section.metadata?.style.minHeight,
+                      marginBottom: section.metadata?.style.marginBottom,
+                      width: section.metadata?.style.minWidth,
+                      backgroundColor: section.metadata?.style.backgroundColor,
+                    }}
+                  >
+                    {/* Render the components inside the section */}
+                    {section.metadata?.components?.map(renderComponent)}
+                  </Box>
+
+                ))
             ) : (
               <Typography>No sections available.</Typography>
             )}

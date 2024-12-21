@@ -212,7 +212,7 @@ export const userAPI = {
       const formData = new FormData();
       formData.append("name", templateData.name);
       formData.append("description", templateData.description);
-      formData.append("accessType", templateData.accessType);
+      // formData.append("accessType", templateData.subscriptionPlanId);
       formData.append("metaData", templateData.metaData);
       formData.append("thumbnailUrl", templateData.thumbnailUrl);
       formData.append("userId", UserId);
@@ -280,7 +280,7 @@ export const userAPI = {
     try {
       // Kiểm tra userId có phải là số nguyên dương không
       if (!Number.isInteger(userId) || userId <= 0) {
-        throw new Error('User ID must be a positive integer');
+        throw new Error("User ID must be a positive integer");
       }
 
       const response = await request.post(`/subscriptions/create`, {
@@ -291,10 +291,10 @@ export const userAPI = {
       return response.data;
     } catch (error) {
       if (error.response) {
-        const message = error.response.data?.message || 'Something went wrong';
+        const message = error.response.data?.message || "Something went wrong";
         throw new Error(message);
       } else if (error.request) {
-        throw new Error('No response received from server. Please try again.');
+        throw new Error("No response received from server. Please try again.");
       } else {
         throw new Error(`Request Error: ${error.message}`);
       }
@@ -308,7 +308,10 @@ export const userAPI = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error updating subscription status:", error.response?.data || error.message);
+      console.error(
+        "Error updating subscription status:",
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -316,17 +319,20 @@ export const userAPI = {
     try {
       // Đảm bảo set đúng headers và body
       const response = await request.patch(
-        '/subscriptions/update-status',
+        "/subscriptions/update-status",
         { orderCode, success },
         {
           headers: {
-            'Content-Type': 'application/json', 
+            "Content-Type": "application/json",
           },
         }
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
-      console.error('Error updating subscription status:', error.response?.data || error.message);
+      console.error(
+        "Error updating subscription status:",
+        error.response?.data || error.message
+      );
       throw error.response?.data || error.message;
     }
   },

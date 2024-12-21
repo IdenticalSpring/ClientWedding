@@ -38,7 +38,7 @@ const Wedding = () => {
       <Header />
       <Box sx={{ alignItems: "center" }}>
         <Typography variant="h4" gutterBottom>
-          Quản lý khách mời
+          Quản lý đám cưới
         </Typography>
       </Box>
 

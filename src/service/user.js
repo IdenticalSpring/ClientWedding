@@ -215,6 +215,11 @@ export const userAPI = {
     const response = await request.get(`/templates/${id}`);
     return response.data;
   },
+  getTemplateByIdEdit: async (id,userId) => {
+    const response = await request.get(`/templates/edit/${id}/user/${userId}`);
+    return response.data;
+  
+  },
   getTemplateUserById: async (id) => {
     const response = await request.get(`/templates_user/${id}`);
     return response.data;

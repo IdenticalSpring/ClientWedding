@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
 import Cookies from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
@@ -27,6 +27,7 @@ const EditTemplate = () => {
   const [template, setTemplate] = useState();
   const [loading, setLoading] = useState(true);
   const [idUser, setIdUser] = useState(null);
+  const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [isPreview, setIsPreview] = useState(false);
@@ -66,8 +67,10 @@ const EditTemplate = () => {
       setIsFetching(true);
 
       try {
-        const response = await userAPI.getTemplateByIdEdit(id, userId);
-        const sortedSections = sortSectionsByPosition(response.data.sections || []);
+        const response = await userAPI.getTemplateById(id);
+        const sortedSections = sortSectionsByPosition(
+          response.data.sections || []
+        );
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
         console.error("Error fetching template:", error);
@@ -180,6 +183,12 @@ const EditTemplate = () => {
     }
 
     try {
+      const updatedSections = sections.map((section, index) => ({
+        ...section,
+        position: String(index + 1), // Chuyển đổi position thành chuỗi
+      }));
+
+      setSections(updatedSections);
       const savedTemplate = await userAPI.createTemplateUser(
         template,
         idUser,
@@ -192,6 +201,7 @@ const EditTemplate = () => {
 
       const sectionsWithMetadata = template.sections.map((section) => ({
         template_userId: templateID,
+        position: section.position,
         metadata: {
           components: section.metadata.components,
           style: section?.metadata?.style,
@@ -297,13 +307,21 @@ const EditTemplate = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <AppBar position="static" color="primary" sx={{ zIndex: 1, height: "60px" }}>
+      <AppBar
+        position="static"
+        color="primary"
+        sx={{ zIndex: 1, height: "60px" }}
+      >
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
             <ArrowBack />
           </IconButton>
           <Box sx={{ flexGrow: 1 }} />
-          <Button color="inherit" startIcon={<Visibility />} onClick={handleView}>
+          <Button
+            color="inherit"
+            startIcon={<Visibility />}
+            onClick={handleView}
+          >
             {isPreview ? "Thoát xem" : "Xem"}
           </Button>
           <Button color="inherit" startIcon={<Save />} onClick={handleSave}>
@@ -312,7 +330,10 @@ const EditTemplate = () => {
         </Toolbar>
       </AppBar>
 
-      <Box ref={sectionRef} sx={{ display: "flex", flex: 1, alignItems: "center" }}>
+      <Box
+        ref={sectionRef}
+        sx={{ display: "flex", flex: 1, alignItems: "center" }}
+      >
         <Box
           sx={{
             width: "250px",
@@ -374,7 +395,9 @@ const EditTemplate = () => {
           onChange={handleBrideNameChange}
           fullWidth
           error={nameError && !brideName}
-          helperText={nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""}
+          helperText={
+            nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""
+          }
           sx={{ mb: 2 }}
         />
         <TextField
@@ -383,7 +406,9 @@ const EditTemplate = () => {
           onChange={handleGroomNameChange}
           fullWidth
           error={nameError && !groomName}
-          helperText={nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""}
+          helperText={
+            nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""
+          }
           sx={{ mb: 2 }}
         />
       </Box>

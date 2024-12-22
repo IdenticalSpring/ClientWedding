@@ -11,8 +11,6 @@ import {
   TextField,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
@@ -63,10 +61,8 @@ const EditTemplate = () => {
       setIsFetching(true);
 
       try {
-        const response = await userAPI.getTemplateById(id);
-        const sortedSections = sortSectionsByPosition(
-          response.data.sections || []
-        );
+        const response = await userAPI.getTemplateByIdEdit(id, userId);
+        const sortedSections = sortSectionsByPosition(response.data.sections || []);
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
         if (error?.response?.status === 400) {

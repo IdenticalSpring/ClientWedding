@@ -8,13 +8,9 @@ import {
   Toolbar,
   IconButton,
   Button,
-  Snackbar,
-  Alert,
   TextField,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
@@ -34,7 +30,8 @@ const EditTemplate = () => {
   const [brideName, setBrideName] = useState("");
   const [groomName, setGroomName] = useState("");
   const [nameError, setNameError] = useState(false);
-  const [hasShownToast, setHasShownToast] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  
   const sectionRef = useRef(null);
   const handleComponentClick = (component) => {
     setSelectedComponent(component);
@@ -58,23 +55,17 @@ const EditTemplate = () => {
     });
   };
 
-
-
-  const [isFetching, setIsFetching] = useState(false);
   useEffect(() => {
     const fetchTemplate = async () => {
       if (isFetching) return;
       setIsFetching(true);
 
       try {
-        const response = await userAPI.getTemplateById(id);
-        const sortedSections = sortSectionsByPosition(
-          response.data.sections || []
-        );
+        const response = await userAPI.getTemplateByIdEdit(id, userId);
+        const sortedSections = sortSectionsByPosition(response.data.sections || []);
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
-        console.error("Error fetching template:", error);
-        if (error.response && error.response.status === 400) {
+        if (error?.response?.status === 400) {
           toast.error('Hãy nâng cấp gói VIP để sử dụng template này.');
         } else {
           toast.error('Đã xảy ra lỗi khi tải template.');
@@ -86,12 +77,8 @@ const EditTemplate = () => {
       }
     };
 
-    fetchTemplate();
-  }, [id]); // Chỉ phụ thuộc vào `id`
-
-
-
-
+    if (!isFetching && id) fetchTemplate();
+  }, [id, userId, isFetching]);
 
   const handleBrideNameChange = (e) => setBrideName(e.target.value);
   const handleGroomNameChange = (e) => setGroomName(e.target.value);

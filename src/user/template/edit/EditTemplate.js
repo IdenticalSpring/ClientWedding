@@ -34,12 +34,11 @@ const EditTemplate = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [isPreview, setIsPreview] = useState(false);
-  const [brideName, setBrideName] = useState("");
-  const [groomName, setGroomName] = useState("");
+  const [linkName, setLinkName] = useState("");
   const [nameError, setNameError] = useState(false);
 
-  const handleBrideNameChange = (e) => setBrideName(e.target.value);
-  const handleGroomNameChange = (e) => setGroomName(e.target.value);
+  const handleLinkNameChange = (e) => setLinkName(e.target.value);
+
 
   const sectionRef = useRef(null);
   const handleComponentClick = (component) => {
@@ -199,9 +198,9 @@ const EditTemplate = () => {
 
   const handleSave = async () => {
     // Kiểm tra nếu tên cô dâu và chú rể không rỗng
-    if (!brideName || !groomName) {
+    if (!linkName) {
       setNameError(true);
-      showSnackbar("Vui lòng nhập tên cô dâu và chú rể!", "error");
+      showSnackbar("Vui lòng nhập tên link vào template!", "error");
       return;
     }
 
@@ -215,8 +214,7 @@ const EditTemplate = () => {
       const savedTemplate = await userAPI.createTemplateUser(
         template,
         idUser,
-        groomName,
-        brideName
+        linkName
       );
       const templateID = savedTemplate.data?.id;
 
@@ -237,12 +235,11 @@ const EditTemplate = () => {
         await userAPI.createSectionUser(section);
       }
 
-      // Cập nhật URL với tên cô dâu và chú rể
-      const encodedBrideName = encodeURIComponent(brideName);
-      const encodedGroomName = encodeURIComponent(groomName);
+   
+      const encodedLinkName = encodeURIComponent(linkName);
       // const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
       // Sử dụng navigate để chuyển tới trang view
-      navigate(`/view/${templateID}/${encodedBrideName}/${encodedGroomName}`);
+      navigate(`/${encodedLinkName}`);
     } catch (error) {
       console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");
@@ -422,25 +419,15 @@ const EditTemplate = () => {
 
       {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
+       
         <TextField
-          label="Tên cô dâu"
-          value={brideName}
-          onChange={handleBrideNameChange}
+          label="Nhập tên Link"
+          value={linkName}
+          onChange={handleLinkNameChange}
           fullWidth
-          error={nameError && !brideName}
+          error={nameError && !linkName}
           helperText={
-            nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""
-          }
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Tên chú rể"
-          value={groomName}
-          onChange={handleGroomNameChange}
-          fullWidth
-          error={nameError && !groomName}
-          helperText={
-            nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""
+            nameError && !linkName ? "Vui lòng nhập tên link!" : ""
           }
           sx={{ mb: 2 }}
         />

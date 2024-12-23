@@ -58,19 +58,20 @@ const WebsiteManagement = () => {
     fetchTemplates();
   }, [page, rowsPerPage]);
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Đã sao chép thành công!");
+  const handleCopy = (template) => {
+    const url = `${window.location.origin}/${template?.linkName}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Đã sao chép liên kết thành công!");
     });
   };
 
+
+
   const handleViewDetails = (template) => {
     alert(`Chi tiết về template: ${template.name}`);
-    console.log(template?.brideName);
-    console.log(template?.groomName);
-
+  
     navigate(
-      `/view/${template?.id}/${template?.brideName}/${template?.groomName}`
+      `/${template?.linkName}`
     );
   };
 
@@ -104,23 +105,27 @@ const WebsiteManagement = () => {
                 {templates.map((template, index) => (
                   <TableRow key={index}>
                     <TableCell>{template.name}</TableCell>
-                    <TableCell>
-                      {template.description || "Chưa có mô tả"}
-                    </TableCell>
+                    <TableCell>{template.description || "Chưa có mô tả"}</TableCell>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                      <IconButton onClick={() => handleCopy(template.name)}>
-                        <CopyIcon />
-                      </IconButton>
-                      <Divider
-                        orientation="vertical"
-                        flexItem
-                        sx={{
-                          marginX: 1,
-                        }}
-                      />
-                      <IconButton onClick={() => handleViewDetails(template)}>
-                        <VisibilityIcon />
-                      </IconButton>
+                      {template.linkName ? (
+                        <>
+                          <IconButton onClick={() => handleCopy(template)}>
+                            <CopyIcon />
+                          </IconButton>
+                          <Divider
+                            orientation="vertical"
+                            flexItem
+                            sx={{
+                              marginX: 1,
+                            }}
+                          />
+                          <IconButton onClick={() => handleViewDetails(template)}>
+                            <VisibilityIcon />
+                          </IconButton>
+                        </>
+                      ) : (
+                        <Typography color="error">Thiếu linkName</Typography>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -23,6 +23,7 @@ import PaymentSuccess from "./landing-page/components/PaymentStatusToast";
 import { ToastContainer } from "react-toastify";
 import PaymentStatusToast from "./landing-page/components/PaymentStatusToast";
 import WeddingList from "./dashboard/Wedding";
+import EditInvitation from "./user/template/EditInvitation";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -121,6 +122,8 @@ function App() {
           path="/:linkName"
           element={<ViewTemplate />}
         />
+        <Route path="/invitation" element={<EditInvitation />} />
+        
       </Routes>
       <PaymentStatusToast />
       <ToastContainer

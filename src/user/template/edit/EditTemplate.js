@@ -8,9 +8,16 @@ import {
   Toolbar,
   IconButton,
   Button,
+  Snackbar,
+  Alert,
   TextField,
+  Slider,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
@@ -27,11 +34,12 @@ const EditTemplate = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [isPreview, setIsPreview] = useState(false);
-  const [brideName, setBrideName] = useState("");
-  const [groomName, setGroomName] = useState("");
+  const [linkName, setLinkName] = useState("");
   const [nameError, setNameError] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
-  
+
+  const handleLinkNameChange = (e) => setLinkName(e.target.value);
+
+
   const sectionRef = useRef(null);
   const handleComponentClick = (component) => {
     setSelectedComponent(component);
@@ -56,10 +64,8 @@ const EditTemplate = () => {
   };
 
   useEffect(() => {
+    const token = Cookies.get("token");
     const fetchTemplate = async () => {
-      if (isFetching) return;
-      setIsFetching(true);
-
       try {
         const response = await userAPI.getTemplateByIdEdit(id, userId);
         const sortedSections = sortSectionsByPosition(response.data.sections || []);
@@ -72,20 +78,27 @@ const EditTemplate = () => {
         }
         navigate('/template');
       } finally {
-        setIsFetching(false);
         setLoading(false);
+      }
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          setIdUser(decoded.sub);
+        } catch (error) {
+          console.error("Lỗi khi giải mã token:", error);
+        }
       }
     };
 
-    if (!isFetching && id) fetchTemplate();
-  }, [id, userId, isFetching]);
+    fetchTemplate();
+  }, [id]);
 
-  const handleBrideNameChange = (e) => setBrideName(e.target.value);
-  const handleGroomNameChange = (e) => setGroomName(e.target.value);
-
-  const handleView = () => setIsPreview((prev) => !prev);
+  const handleView = () => {
+    setIsPreview((prev) => !prev);
+  };
 
   const handleStyleChange = (key, value) => {
+    console.log("Handle style change:", key, value);
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -98,19 +111,30 @@ const EditTemplate = () => {
           ...section.metadata,
           components: section.metadata.components.map((comp) =>
             comp.id === selectedComponent.id
-              ? { ...comp, style: { ...comp.style, [key]: value } }
+              ? {
+                ...comp,
+                style: { ...comp.style, [key]: value },
+              }
               : comp
           ),
         },
       }));
 
-      setTemplate((prev) => ({ ...prev, sections: updatedSections }));
+      setTemplate((prev) => ({
+        ...prev,
+        sections: updatedSections,
+      }));
     }
   };
 
   const handleTextChange = (value) => {
+    console.log("🚀 ~ handleTextChange ~ value:", value)
+
     if (selectedComponent) {
-      setSelectedComponent((prev) => ({ ...prev, text: value }));
+      setSelectedComponent((prev) => ({
+        ...prev,
+        text: value,
+      }));
 
       const updatedSections = template.sections.map((section) => ({
         ...section,
@@ -122,7 +146,10 @@ const EditTemplate = () => {
         },
       }));
 
-      setTemplate((prev) => ({ ...prev, sections: updatedSections }));
+      setTemplate((prev) => ({
+        ...prev,
+        sections: updatedSections,
+      }));
     }
   };
 
@@ -132,9 +159,13 @@ const EditTemplate = () => {
       try {
         const imageData = await userAPI.uploadImages(file);
         const imageURL = imageData.data.url;
+        // Cập nhật src trong selectedComponent
+        setSelectedComponent((prev) => ({
+          ...prev,
+          src: imageURL,
+        }));
 
-        setSelectedComponent((prev) => ({ ...prev, src: imageURL }));
-
+        // Cập nhật src trong template.sections
         const updatedSections = template.sections.map((section) => {
           if (section.id === selectedSection.id) {
             return {
@@ -152,7 +183,10 @@ const EditTemplate = () => {
           return section;
         });
 
-        setTemplate((prev) => ({ ...prev, sections: updatedSections }));
+        setTemplate((prev) => ({
+          ...prev,
+          sections: updatedSections,
+        }));
 
         showSnackbar("Upload ảnh thành công!", "success");
       } catch (error) {
@@ -163,9 +197,10 @@ const EditTemplate = () => {
   };
 
   const handleSave = async () => {
-    if (!brideName || !groomName) {
+    // Kiểm tra nếu tên cô dâu và chú rể không rỗng
+    if (!linkName) {
       setNameError(true);
-      showSnackbar("Vui lòng nhập tên cô dâu và chú rể!", "error");
+      showSnackbar("Vui lòng nhập tên link vào template!", "error");
       return;
     }
 
@@ -179,12 +214,13 @@ const EditTemplate = () => {
       const savedTemplate = await userAPI.createTemplateUser(
         template,
         idUser,
-        groomName,
-        brideName
+        linkName
       );
       const templateID = savedTemplate.data?.id;
 
-      if (!templateID) throw new Error("Không thể lấy được templateId!");
+      if (!templateID) {
+        throw new Error("Không thể lấy được templateId!");
+      }
 
       const sectionsWithMetadata = template.sections.map((section) => ({
         template_userId: templateID,
@@ -199,18 +235,23 @@ const EditTemplate = () => {
         await userAPI.createSectionUser(section);
       }
 
-      const encodedBrideName = encodeURIComponent(brideName);
-      const encodedGroomName = encodeURIComponent(groomName);
-      navigate(`/view/${templateID}/${encodedBrideName}/${encodedGroomName}`);
+   
+      const encodedLinkName = encodeURIComponent(linkName);
+      // const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
+      // Sử dụng navigate để chuyển tới trang view
+      navigate(`/${encodedLinkName}`);
     } catch (error) {
       console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");
     }
   };
+  const handleBack = () => {
+    navigate(-1);
+  };
 
-  const handleBack = () => navigate(-1);
-
-  const handleSectionClick = (section) => setSelectedSection(section);
+  const handleSectionClick = (section) => {
+    setSelectedSection(section);
+  };
 
   if (loading) {
     return (
@@ -260,8 +301,8 @@ const EditTemplate = () => {
               position: "relative",
               border: "1px solid #ccc",
               padding: 2,
-              minHeight: section?.metadata?.style?.minHeight || "500px",
-              minWidth: section?.metadata?.style?.minWidth || "800px",
+              minHeight: section.metadata.style.minHeight,
+              minWidth: section?.metadata?.style?.minWidth,
               boxSizing: "border-box",
               overflow: "hidden",
               marginBottom: 2,
@@ -294,11 +335,7 @@ const EditTemplate = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <AppBar
-        position="static"
-        color="primary"
-        sx={{ zIndex: 1, height: "60px" }}
-      >
+      <AppBar position="static" color="primary" sx={{ zIndex: 1, height: "60px" }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
             <ArrowBack />
@@ -308,19 +345,24 @@ const EditTemplate = () => {
             color="inherit"
             startIcon={<Visibility />}
             onClick={handleView}
+            sx={{ marginRight: 1 }}
           >
             {isPreview ? "Thoát xem" : "Xem"}
           </Button>
           <Button color="inherit" startIcon={<Save />} onClick={handleSave}>
             Lưu
           </Button>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+          >
+            <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+          </Snackbar>
         </Toolbar>
       </AppBar>
 
-      <Box
-        ref={sectionRef}
-        sx={{ display: "flex", flex: 1, alignItems: "center" }}
-      >
+      <Box ref={sectionRef} sx={{ display: "flex", flex: 1, alignItems: "center" }}>
         <Box
           sx={{
             width: "250px",
@@ -341,16 +383,16 @@ const EditTemplate = () => {
               position: "relative",
               border: "1px dashed #ccc",
               padding: 2,
-              minHeight: selectedSection?.metadata?.style?.minHeight || "500px",
-              minWidth: selectedSection?.metadata?.style?.minWidth || "800px",
+              minHeight: selectedSection.metadata.style.minHeight,
+              minWidth: selectedSection?.metadata?.style?.minWidth,
               backgroundColor: "#f9f9f9",
               boxSizing: "border-box",
               overflow: "hidden",
-              marginLeft: 2,
+              marginLeft: 2
             }}
           >
             {selectedSection.metadata?.components?.map((component) => {
-              const updatedComponent = sortedSections
+              const updatedComponent = template.sections
                 .find((section) => section.id === selectedSection.id)
                 ?.metadata.components.find((comp) => comp.id === component.id);
 
@@ -375,26 +417,17 @@ const EditTemplate = () => {
         />
       </Box>
 
+      {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
+       
         <TextField
-          label="Tên cô dâu"
-          value={brideName}
-          onChange={handleBrideNameChange}
+          label="Nhập tên Link"
+          value={linkName}
+          onChange={handleLinkNameChange}
           fullWidth
-          error={nameError && !brideName}
+          error={nameError && !linkName}
           helperText={
-            nameError && !brideName ? "Vui lòng nhập tên cô dâu!" : ""
-          }
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Tên chú rể"
-          value={groomName}
-          onChange={handleGroomNameChange}
-          fullWidth
-          error={nameError && !groomName}
-          helperText={
-            nameError && !groomName ? "Vui lòng nhập tên chú rể!" : ""
+            nameError && !linkName ? "Vui lòng nhập tên link!" : ""
           }
           sx={{ mb: 2 }}
         />

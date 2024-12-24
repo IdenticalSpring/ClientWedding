@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../../service/user";
-import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, Snackbar, Alert } from "@mui/material";
 
 const ViewTemplate = () => {
-  const { templateID, brideName, groomName } = useParams();
+  const { linkName} = useParams();
   const [template, setTemplate] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -17,7 +16,7 @@ const ViewTemplate = () => {
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const response = await userAPI.getTemplateUserById(templateID);
+        const response = await userAPI.getTemplateUserBylinkName(linkName);
         setTemplate(response.data);
       } catch (error) {
         console.error("Error fetching template:", error);
@@ -28,7 +27,7 @@ const ViewTemplate = () => {
     };
 
     fetchTemplate();
-  }, [templateID]);
+  }, [linkName]);
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
@@ -73,11 +72,6 @@ const ViewTemplate = () => {
       <Typography variant="h4" gutterBottom>
         Template View
       </Typography>
-
-      <Typography variant="h6" gutterBottom>
-        {`Cô dâu: ${brideName} - Chú rể: ${groomName}`}
-      </Typography>
-
       <Box
         sx={{
           display: "flex",

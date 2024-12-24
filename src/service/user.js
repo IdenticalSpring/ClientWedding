@@ -224,7 +224,11 @@ export const userAPI = {
     const response = await request.get(`/templates_user/${id}`);
     return response.data;
   },
-  createTemplateUser: async (templateData, UserId, brideName, groomName) => {
+  getTemplateUserBylinkName: async (linkName) => {
+    const response = await request.get(`/templates_user/link/${linkName}`);
+    return response.data;
+  },
+  createTemplateUser: async (templateData, UserId, linkName, ) => {
     try {
       const formData = new FormData();
       formData.append("name", templateData.name);
@@ -233,8 +237,8 @@ export const userAPI = {
       formData.append("metaData", templateData.metaData);
       formData.append("thumbnailUrl", templateData.thumbnailUrl);
       formData.append("userId", UserId);
-      formData.append("groomName", groomName);
-      formData.append("brideName", brideName);
+      formData.append("linkName", linkName);
+  
       const response = await request.post("/templates_user", formData, {
         headers: {
           "Content-Type": "multipart/form-data",

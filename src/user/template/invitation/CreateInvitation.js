@@ -174,24 +174,7 @@ const CreateInvitation = () => {
             )
         );
     };
-    const addSection = () => {
-        const newSection = {
-            id: `section-${Date.now()}`,
-            position: sections.length + 1,
-            components: [],
-            style: { }, // Áp dụng style mặc định
-        };
-
-        setSections((prev) => [...prev, newSection]);
-        showSnackbar("New section added!", "success");
-    };
-
-
-
-    const handleComponentClick = (component) => {
-        setActiveItem(component);
-        setActiveStyles(component.style || {});
-    };
+ 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -275,11 +258,14 @@ const CreateInvitation = () => {
                         sx={{
                             flex: 1,
                             position: "relative",
-                            backgroundColor: "#FCFCFC",
+                            backgroundColor: "#f9f9f9", // Đồng bộ màu nền
                             display: "flex",
-                            alignItems: "center",
+                            alignItems: "flex-start", // Đặt căn chỉnh lên trên
                             justifyContent: "center",
-                            overflow: "auto", // Đảm bảo cuộn nếu nội dung lớn hơn khung nhìn
+                            overflow: "hidden", // Ẩn phần thừa
+                            height: "calc(100vh - 80px)", // Chiều cao tính toán (trừ phần header)
+                            margin: 0,
+                            padding: 0,
                         }}
                     >
                         <Box
@@ -300,6 +286,8 @@ const CreateInvitation = () => {
                             />
                         </Box>
                     </Box>
+
+
 
 
                     <Toolbar

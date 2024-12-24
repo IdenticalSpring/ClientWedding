@@ -118,7 +118,7 @@ function App() {
         <Route path="/template/:id" element={<TemplateDetail />} />
         <Route path="/template/edit/:id" element={<EditTemplate />} />
         <Route
-          path="/view/:templateID/:brideName/:groomName"
+          path="/:linkName"
           element={<ViewTemplate />}
         />
       </Routes>

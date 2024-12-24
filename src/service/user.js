@@ -357,4 +357,22 @@ export const userAPI = {
       throw error.response?.data || error.message;
     }
   },
+  createInvitation: async (invitationData) => {
+    try {
+      const response = await request.post(`/invitations`, invitationData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating invitation:", error);
+      throw error.response?.data || { message: "Failed to create invitation" };
+    }
+  },
+  getInvitationById: async (id) => {
+    try {
+      const response = await request.get(`/invitations/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching invitation by ID:", error);
+      throw error.response?.data || { message: "Failed to fetch invitation" };
+    }
+  },
 };

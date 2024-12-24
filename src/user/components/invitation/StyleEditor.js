@@ -123,10 +123,7 @@ const StyleEditor = ({
           label="Gradient"
           sx={{ mb: 1 }}
         />
-        <Typography variant="subtitle2" sx={{ fontWeight: 500, mt: 2 }}>
-          SelectID
-        </Typography>
-        <DropdownMenu selectedItem={selectedItem} onChange={onChange} />
+
         <Typography variant="subtitle2" sx={{ fontWeight: 500, mt: 2 }}>
           Height Section
         </Typography>

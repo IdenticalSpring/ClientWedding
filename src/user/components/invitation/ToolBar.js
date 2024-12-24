@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, TextField, MenuItem, Input } from "@mui/material";
+import { Box, Tabs, Tab, TextField, Input } from "@mui/material";
 import StyleEditor from "./StyleEditor";
 import {
   TextBox,
@@ -9,18 +9,15 @@ import {
   Diamond,
   Line,
 } from "../../../utils/draggableComponents";
-import { getAllSubscription } from "../../../service/templateService"; 
 
 const Toolbar = ({
   activeStyles,
   handleStyleChange,
-  templateData,
-  setTemplateData,
-  selectedItem,
-  onDropdownChange,
+  invitationData,
+  setInvitationData,
 }) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [subscriptions, setSubscriptions] = useState([]);
+
   useEffect(() => {
     if (activeStyles) {
       setTabIndex(1);
@@ -28,19 +25,6 @@ const Toolbar = ({
       setTabIndex(0);
     }
   }, [activeStyles]);
-  useEffect(() => {
-    // Gọi API khi component được mount
-    const fetchSubscriptions = async () => {
-      try {
-        const data = await getAllSubscription();
-        setSubscriptions(data); // Lưu trữ kết quả API trong state
-      } catch (error) {
-        console.error("Error fetching subscriptions:", error);
-      }
-    };
-
-    fetchSubscriptions();
-  }, []);
 
   const handleTabChange = (event, newValue) => {
     if (newValue === 1 && !activeStyles) return;
@@ -48,7 +32,7 @@ const Toolbar = ({
   };
 
   const handleInputChange = (field, value) => {
-    setTemplateData((prevData) => ({
+    setInvitationData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
@@ -56,7 +40,7 @@ const Toolbar = ({
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setTemplateData((prevData) => ({
+    setInvitationData((prevData) => ({
       ...prevData,
       thumbnailUrl: file,
     }));
@@ -90,6 +74,7 @@ const Toolbar = ({
       </Tabs>
 
       <Box sx={{ flexGrow: 1, width: "100%", mt: 2 }}>
+        {/* Shape Tab */}
         {tabIndex === 2 && (
           <Box>
             <TextBox />
@@ -101,79 +86,45 @@ const Toolbar = ({
           </Box>
         )}
 
+        {/* Style Tab */}
         {activeStyles && tabIndex === 1 && (
           <Box>
             <StyleEditor
               activeStyles={activeStyles}
               handleStyleChange={handleStyleChange}
-              selectedItem={selectedItem}
-              onChange={onDropdownChange}
             />
           </Box>
         )}
 
+        {/* General Tab */}
         {tabIndex === 0 && (
           <Box>
             <TextField
               fullWidth
-              label="Name"
+              label="Title"
               variant="outlined"
-              value={templateData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              value={invitationData.title || ""}
+              onChange={(e) => handleInputChange("title", e.target.value)}
               margin="normal"
             />
             <TextField
               fullWidth
-              label="Description"
+              label="Message"
               variant="outlined"
-              value={templateData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
+              value={invitationData.message || ""}
+              onChange={(e) => handleInputChange("message", e.target.value)}
               margin="normal"
             />
-            {/* Dropdown hiển thị kết quả API */}
             <TextField
               fullWidth
-              select
-              label="Subscription Plan"
-              value={templateData.subscriptionPlanId || ""}
-              onChange={(e) =>
-                handleInputChange("subscriptionPlanId", e.target.value)
-              }
+              label="Audience"
+              variant="outlined"
+              value={invitationData.audience || ""}
+              onChange={(e) => handleInputChange("audience", e.target.value)}
               margin="normal"
-            >
-              {subscriptions.map((subscription) => (
-                <MenuItem key={subscription.id} value={subscription.id}>
-                  {subscription.name}
-                </MenuItem>
-              ))}
-            </TextField>
+            />
 
-            {/* Trường upload ảnh thumbnail */}
-            <Box sx={{ marginTop: "16px" }}>
-              <Input
-                type="file"
-                onChange={handleFileChange}
-                fullWidth
-                inputProps={{ accept: "image/*" }}
-              />
-              {templateData.thumbnailUrl && (
-                <Box sx={{ marginTop: "8px" }}>
-                  {templateData.thumbnailUrl instanceof File ? (
-                    <img
-                      src={URL.createObjectURL(templateData.thumbnailUrl)}
-                      alt="Thumbnail"
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <span>Invalid file</span>
-                  )}
-                </Box>
-              )}
-            </Box>
+           
           </Box>
         )}
       </Box>

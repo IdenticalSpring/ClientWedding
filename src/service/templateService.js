@@ -245,8 +245,5 @@ export default {
   deleteTemplateById,
   createSection,
   getSectionsByTemplateId,
-  uploadImages,
-  createInvitation,
-  updateInvitation,
-  getInvitationById
+  uploadImages
 };

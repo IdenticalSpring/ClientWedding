@@ -16,7 +16,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Header from "../dashboard/components/Header";
-import { userAPI } from "../service/user"; // Gọi API từ AdminAPI
+import { userAPI } from "../service/user";
 import ModalConfirmDelete from "../dashboard/modal-clients/DeleteUser";
 import ModalAddUser from "../dashboard/modal-clients/CreateUser";
 import Cookies from "js-cookie";
@@ -61,7 +61,6 @@ const Clients = () => {
       setGuests(guests);
       setTotalGuests(total);
     } catch (error) {
-      console.error("Error fetching guests:", error);
       setNotification({
         open: true,
         severity: "error",
@@ -121,14 +120,14 @@ const Clients = () => {
   return (
     <>
       <Header />
-      <Box sx={{ alignItems: "center" }}>
+      {/* <Box sx={{ alignItems: "center" }}>
         <Typography variant="h4" gutterBottom>
           Quản lý khách mời
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Dropdown để chọn đám cưới */}
-      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2, marginTop: 2, }}>
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel id="wedding-select-label">Chọn đám cưới</InputLabel>
           <Select
@@ -174,40 +173,18 @@ const Clients = () => {
         </Button>
       </Box>
 
-      <Box sx={{ height: 500 }}>
+      <Box
+        sx={{
+          height: 500,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {loading ? (
-          Array.from({ length: 5 }).map((_, index) => (
-            <Box
-              sx={{ display: "flex", flexDirection: "row", marginBottom: 2 }}
-              key={index}
-            >
-              <Skeleton
-                variant="text"
-                width="20%"
-                height={40}
-                sx={{ marginRight: 2 }}
-              />
-              <Skeleton
-                variant="text"
-                width="30%"
-                height={40}
-                sx={{ marginRight: 2 }}
-              />
-              <Skeleton
-                variant="text"
-                width="20%"
-                height={40}
-                sx={{ marginRight: 2 }}
-              />
-              <Skeleton
-                variant="text"
-                width="20%"
-                height={40}
-                sx={{ marginRight: 2 }}
-              />
-              <Skeleton variant="circular" width={40} height={40} />
-            </Box>
-          ))
+          <Typography variant="h6" color="text.secondary">
+            Hãy chọn đám cưới để xem danh sách khách mời.
+          </Typography>
         ) : guests.length === 0 ? (
           <Typography variant="h6" color="text.secondary">
             Không có khách mời nào trong đám cưới này.

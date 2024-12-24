@@ -36,11 +36,11 @@ const Wedding = () => {
   return (
     <>
       <Header />
-      <Box sx={{ alignItems: "center" }}>
+      {/* <Box sx={{ alignItems: "center" }}>
         <Typography variant="h4" gutterBottom>
           Quản lý đám cưới
         </Typography>
-      </Box>
+      </Box> */}
 
       <Box
         sx={{
@@ -49,6 +49,7 @@ const Wedding = () => {
           gap: 2,
           mb: 2,
           alignItems: "center",
+          marginTop: 2,
         }}
       >
         <Button

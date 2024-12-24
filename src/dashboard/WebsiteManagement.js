@@ -82,10 +82,10 @@ const WebsiteManagement = () => {
   return (
     <>
       <Header />
-      <Box sx={{ alignItems: "center" }}>
-        <Typography variant="h4" gutterBottom>
+      <Box sx={{ alignItems: "center",marginTop: 2, }}>
+        {/* <Typography variant="h4" gutterBottom>
           Website template đã lưu
-        </Typography>
+        </Typography> */}
 
         {loading && <CircularProgress />}
 

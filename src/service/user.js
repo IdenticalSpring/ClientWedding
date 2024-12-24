@@ -182,21 +182,6 @@ export const userAPI = {
     }
   },
 
-  uploadImages: async (image) => {
-    try {
-      const formData = new FormData();
-      formData.append("image", image);
-      const response = await request.post("/images/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error creating image:", error);
-      throw error.response?.data || { message: "Failed to create image" };
-    }
-  },
   getAllTemplates: async (page, limit) => {
     try {
       const response = await request.get(`/templates`, {
@@ -373,6 +358,29 @@ export const userAPI = {
     } catch (error) {
       console.error("Error fetching invitation by ID:", error);
       throw error.response?.data || { message: "Failed to fetch invitation" };
+    }
+  },
+  updateInvitation: async (invitationData) => {
+    try {
+      const { id, ...dataWithoutId } = invitationData;
+      const response = await request.put(`/invitations/${id}`, dataWithoutId);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating invitation:", error);
+      throw error.response?.data || { message: "Failed to update invitation" };
+    }
+  },
+
+  deleteInvitation: async (invitationId) => {
+    try {
+      const response = await request.delete(
+        `/invitations/by-template/${invitationId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Lỗi khi xóa thiệp cưới."
+      );
     }
   },
 };

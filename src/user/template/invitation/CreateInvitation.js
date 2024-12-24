@@ -10,7 +10,7 @@ import { userAPI } from "../../../service/user";
 import LayerList from "../../components/invitation/LayerList";
 
 const CreateInvitation = () => {
-    const { id } = useParams(); // Get template_userId from URL
+    const { id } = useParams();
     const [sections, setSections] = useState([]);
     const [activeItem, setActiveItem] = useState(null);
     const [activeStyles, setActiveStyles] = useState({});
@@ -23,44 +23,96 @@ const CreateInvitation = () => {
         message: "",
         audience: "",
         template_userId: id,
-        metadata: {}, // Empty metadata to start
+        metadata: {},
     });
+    const [existingInvitation, setExistingInvitation] = useState(false);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
         severity: "",
     });
 
-    // Convert metadata to sections when loading data
     const fetchInvitationData = async () => {
         try {
-            const response = await userAPI.getInvitationById(id);
-            const data = response.data;
+            const response = await userAPI.getTemplateUserById(id);
+            if (response?.data) {
+                const data = response.data;
 
-            setInvitationData(data);
-            const processedSections = processMetadataToSections(data.metadata);
-            setSections(processedSections);
+                if (data.invitation) {
+                    setInvitationData({
+                        id: data.invitation.id, // Ensure ID is added here
+                        ...data.invitation,
+                        metadata: data.invitation.metadata || {},
+                    });
+
+                    const processedSections = processMetadataToSections(data.invitation.metadata);
+                    setSections(processedSections.length > 0 ? processedSections : [createDefaultSection()]);
+                    setExistingInvitation(true);
+                } else {
+                    initializeDefaultInvitation();
+                    showSnackbar("No existing invitation found. Default section created.", "info");
+                }
+            } else {
+                initializeDefaultInvitation();
+                showSnackbar("No template data found. Default section created.", "info");
+            }
         } catch (error) {
             console.error("Error fetching invitation data:", error);
-            showSnackbar("Failed to load invitation data!", "error");
+            initializeDefaultInvitation();
+            showSnackbar("Error loading invitation data. Default section created.", "error");
         }
     };
+
+    // Function to initialize default invitation and section
+    const initializeDefaultInvitation = () => {
+        setInvitationData({
+            id: "",
+            title: "",
+            message: "",
+            audience: "",
+            template_userId: id,
+            metadata: {},
+        });
+        setSections([createDefaultSection()]);
+        setExistingInvitation(false);
+    };
+
+    // Function to create a default section
+    const createDefaultSection = () => ({
+        id: `section-${Date.now()}`,
+        position: "1",
+        components: [],
+        style: {
+            width: "100%",
+            minWidth: "800px",
+            minHeight: "500px",
+            padding: "10px",
+            backgroundColor: "#f9f9f9",
+            border: "1px solid #ddd",
+            position: "relative",
+        },
+    });
+
 
     useEffect(() => {
         fetchInvitationData();
     }, [id]);
 
-    // Helper to process metadata into sections
+
+
     const processMetadataToSections = (metadata) => {
         const styles = metadata?.style || [];
         const components = metadata?.components || [];
-
         return styles.map((styleItem, index) => ({
             id: `section-${index}`,
-            style: styleItem,
+            style: {
+              
+                ...styleItem, // Ghi đè style từ metadata
+            },
             components: components[index] || [],
         }));
     };
+
 
     const showSnackbar = (message, severity) => {
         setSnackbar({ open: true, message, severity });
@@ -73,18 +125,31 @@ const CreateInvitation = () => {
                 style: sections.map((section) => section.style),
             };
 
-            const dataToSave = { ...invitationData, metadata };
+            // Loại bỏ các trường không cần thiết
+            const { id, createdAt, updatedAt, ...filteredInvitationData } = invitationData;
+
+            const dataToSave = { ...filteredInvitationData, metadata };
 
             console.log("Saving invitation data:", dataToSave);
 
-            const savedInvitation = await userAPI.createInvitation(dataToSave);
-            console.log("Invitation saved successfully:", savedInvitation);
-            showSnackbar("Invitation saved successfully!", "success");
+            if (existingInvitation) {
+                // Update existing invitation
+                const updatedInvitation = await userAPI.updateInvitation({ ...dataToSave, id });
+                console.log("Invitation updated successfully:", updatedInvitation);
+                showSnackbar("Invitation updated successfully!", "success");
+            } else {
+                // Create new invitation
+                const savedInvitation = await userAPI.createInvitation(dataToSave);
+                console.log("Invitation created successfully:", savedInvitation);
+                showSnackbar("Invitation created successfully!", "success");
+                setExistingInvitation(true);
+            }
         } catch (error) {
             console.error("Error saving invitation:", error);
             showSnackbar("Failed to save invitation!", "error");
         }
     };
+
 
 
     const handleStyleChange = (key, value) => {
@@ -109,33 +174,78 @@ const CreateInvitation = () => {
             )
         );
     };
-
     const addSection = () => {
         const newSection = {
             id: `section-${Date.now()}`,
             position: sections.length + 1,
             components: [],
-            style: {
-                width: "100%",
-                minWidth: "800px",
-                height: "100%",
-                padding: 2,
-                position: "relative",
-                marginBottom: 2,
-                minHeight: "500px",
-                backgroundColor: "#f9f9f9",
-                transition: "border 0.3s ease",
-            },
+            style: { }, // Áp dụng style mặc định
         };
 
         setSections((prev) => [...prev, newSection]);
         showSnackbar("New section added!", "success");
     };
 
+
+
     const handleComponentClick = (component) => {
         setActiveItem(component);
         setActiveStyles(component.style || {});
     };
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            try {
+                // Gọi API để tải ảnh lên
+                const response = await userAPI.uploadImages(file);
+
+                // Kiểm tra phản hồi từ API
+                if (response?.data?.url) {
+                    const uploadedImageUrl = response.data.url;
+
+                    // Cập nhật src cho activeItem
+                    setActiveItem((prev) => {
+                        if (!prev) {
+                            console.error("No active item to update!");
+                            return prev;
+                        }
+
+                        // Cập nhật `src` trong activeItem
+                        const updatedItem = { ...prev, src: uploadedImageUrl };
+
+                        // Cập nhật lại sections với item đã sửa đổi
+                        setSections((prevSections) =>
+                            prevSections.map((section) =>
+                                section.id === updatedItem.sectionId
+                                    ? {
+                                        ...section,
+                                        components: section.components.map((comp) =>
+                                            comp.id === updatedItem.id
+                                                ? updatedItem
+                                                : comp
+                                        ),
+                                    }
+                                    : section
+                            )
+                        );
+
+                        console.log("Image uploaded and active item updated:", uploadedImageUrl);
+                        return updatedItem;
+                    });
+
+                    // Hiển thị thông báo thành công
+                    showSnackbar("Image uploaded successfully!", "success");
+                } else {
+                    console.error("Image upload failed: No URL in response");
+                    showSnackbar("Image upload failed: No URL in response", "error");
+                }
+            } catch (error) {
+                console.error("Error uploading image:", error);
+                showSnackbar("Error uploading image", "error");
+            }
+        }
+    };
+
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -166,22 +276,47 @@ const CreateInvitation = () => {
                             flex: 1,
                             position: "relative",
                             backgroundColor: "#FCFCFC",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "auto", // Đảm bảo cuộn nếu nội dung lớn hơn khung nhìn
                         }}
                     >
-                        <Canvas
-                            sections={sections}
-                            setSections={setSections}
-                            setActiveItem={handleComponentClick}
-                            activeItem={activeItem}
-                            setActiveStyles={setActiveStyles}
-                        />
+                        <Box
+                            sx={{
+                                width: "100%",
+                                height: "100%",
+                                transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
+                                transformOrigin: "center",
+                                transition: isPanning.current ? "none" : "transform 0.2s ease-out",
+                            }}
+                        >
+                            <Canvas
+                                sections={sections}
+                                setSections={setSections}
+                                setActiveItem={setActiveItem}
+                                activeItem={activeItem}
+                                setActiveStyles={setActiveStyles}
+                            />
+                        </Box>
                     </Box>
+
+
                     <Toolbar
                         activeStyles={activeStyles}
                         handleStyleChange={handleStyleChange}
                         invitationData={invitationData}
                         setInvitationData={setInvitationData}
+                        updateSections={setSections}
+                        selectedComponent={activeItem}
+                        handleTextChange={(value) => {
+                            setActiveItem((prev) => ({ ...prev, text: value }));
+                        }}
+                        handleFileUpload={handleFileUpload}
                     />
+
+
+
                 </Box>
                 <Box
                     sx={{
@@ -189,15 +324,21 @@ const CreateInvitation = () => {
                         bottom: "20px",
                         left: "50%",
                         transform: "translateX(-50%)",
+                        display: "flex",
+                        gap: "10px",
                     }}
                 >
-                    <Button variant="contained" onClick={addSection}>
-                        Add Section
-                    </Button>
-                    <Button variant="contained" onClick={handleSaveInvitation}>
+
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleSaveInvitation}
+                        sx={{ padding: "10px 20px", borderRadius: "5px", fontSize: "16px" }}
+                    >
                         Save Invitation
                     </Button>
                 </Box>
+
             </Box>
             <Snackbar
                 open={snackbar.open}
@@ -209,5 +350,5 @@ const CreateInvitation = () => {
         </DndProvider>
     );
 };
-
 export default CreateInvitation;
+

@@ -12,17 +12,20 @@ import {
   IconButton,
   Pagination,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import {
   CopyAll as CopyIcon,
   Visibility as VisibilityIcon,
-} from "@mui/icons-material";
+  Edit as EditIcon,
+} from "@mui/icons-material"; // Sử dụng icon
 import Header from "../dashboard/components/Header";
 import { userAPI } from "../service/user";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-
+import {jwtDecode} from "jwt-decode"; // Chỉnh đúng import
+import PreviewIcon from '@mui/icons-material/Preview';
+import DeleteIcon from "@mui/icons-material/Delete";
 const WebsiteManagement = () => {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
@@ -31,6 +34,8 @@ const WebsiteManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [viewType, setViewType] = useState('template');
+  const [sortBy, setSortBy] = useState('newest');
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -65,26 +70,48 @@ const WebsiteManagement = () => {
     });
   };
 
-
-
   const handleViewDetails = (template) => {
-    alert(`Chi tiết về template: ${template.name}`);
-  
-    navigate(
-      `/${template?.linkName}`
-    );
+    navigate(`/${template?.linkName}`);
+  };
+
+  const handleInvitationActions = (template) => {
+    navigate(`/invitation/${template.id}`);
+  };
+
+  const handleViewInvitation = (template) => {
+    navigate(`/invitation/view/${template.linkName}`);
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  const handleCopyInvitation = (template) => {
+    const url = `${window.location.origin}/invitation/view/${template.linkName}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Đã sao chép liên kết thiệp cưới thành công!");
+    });
+  };
 
+  const handleDeleteInvitation = async (template) => {
+    const confirmDelete = window.confirm(
+      "Bạn có chắc chắn muốn xóa thiệp cưới này không?"
+    );
+    if (confirmDelete) {
+      try {
+        await userAPI.deleteInvitation(template.id); // Gọi API xóa thiệp cưới
+        alert("Thiệp cưới đã được xóa thành công!");
+      } catch (error) {
+        console.error("Lỗi khi xóa thiệp cưới:", error);
+        alert("Xóa thiệp cưới thất bại!");
+      }
+    }
+  };
   return (
     <>
       <Header />
       <Box sx={{ alignItems: "center" }}>
         <Typography variant="h4" gutterBottom>
-          Website template đã lưu
+          Website Template đã lưu
         </Typography>
 
         {loading && <CircularProgress />}
@@ -94,35 +121,71 @@ const WebsiteManagement = () => {
         {templates.length > 0 ? (
           <TableContainer>
             <Table>
-              <TableHead sx={{ alignItems: "center" }}>
+              <TableHead>
                 <TableRow>
                   <TableCell>Tên</TableCell>
                   <TableCell>Mô tả</TableCell>
-                  <TableCell>Hành động</TableCell>
+                  <TableCell>Template</TableCell>
+                  <TableCell>Thiệp cưới</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {templates.map((template, index) => (
                   <TableRow key={index}>
+                    {/* Tên template */}
                     <TableCell>{template.name}</TableCell>
+
+                    {/* Mô tả */}
                     <TableCell>{template.description || "Chưa có mô tả"}</TableCell>
-                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
+
+                    {/* Template Actions */}
+                    <TableCell>
                       {template.linkName ? (
-                        <>
-                          <IconButton onClick={() => handleCopy(template)}>
-                            <CopyIcon />
-                          </IconButton>
-                          <Divider
-                            orientation="vertical"
-                            flexItem
-                            sx={{
-                              marginX: 1,
-                            }}
-                          />
-                          <IconButton onClick={() => handleViewDetails(template)}>
-                            <VisibilityIcon />
-                          </IconButton>
-                        </>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Tooltip title="Sao chép liên kết">
+                            <IconButton onClick={() => handleCopy(template)}>
+                              <CopyIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Xem chi tiết">
+                            <IconButton onClick={() => handleViewDetails(template)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      ) : (
+                        <Typography color="error">Thiếu linkName</Typography>
+                      )}
+                    </TableCell>
+
+                    {/* Thiệp cưới Actions */}
+                    <TableCell>
+                      {template.linkName ? (
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Tooltip title="Thêm/Sửa Thiệp Mời">
+                            <IconButton onClick={() => handleInvitationActions(template)}>
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Xem Thiệp Mời">
+                            <IconButton onClick={() => handleViewInvitation(template)}>
+                              <PreviewIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Sao chép Thiệp Mời">
+                            <IconButton onClick={() => handleCopyInvitation(template)}>
+                              <CopyIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Xóa Thiệp Mời">
+                            <IconButton
+                              onClick={() => handleDeleteInvitation(template)}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       ) : (
                         <Typography color="error">Thiếu linkName</Typography>
                       )}
@@ -130,7 +193,8 @@ const WebsiteManagement = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table>;
+
           </TableContainer>
         ) : (
           !loading && <Typography>Không có template nào</Typography>

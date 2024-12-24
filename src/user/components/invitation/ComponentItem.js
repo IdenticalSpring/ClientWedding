@@ -11,7 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { uploadImages } from "../../../service/templateService";
+import { userAPI } from "../../../service/user";
 
 const ComponentItem = ({
   component,
@@ -24,7 +24,7 @@ const ComponentItem = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [imageSrc, setImageSrc] = useState(component.src || ""); // Đường dẫn ảnh
+  const [imageSrc, setImageSrc] = useState(component.src || "");
   const [openTextEdit, setOpenTextEdit] = useState(false);
 
   const [newText, setNewText] = useState(component.text || "");
@@ -81,7 +81,7 @@ const ComponentItem = ({
     const file = e.target.files[0];
     if (file) {
       try {
-        const uploadedImage = await uploadImages(file);
+        const uploadedImage = await userAPI.uploadImages(file);
         setImageSrc(uploadedImage.data.url);
         component.src = uploadedImage.data.url;
       } catch (error) {

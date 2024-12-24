@@ -13,25 +13,37 @@ const Canvas = ({
   return (
     <Box
       sx={{
-        border: "1px solid #ddd",
-        // padding: 2,
-        minHeight: "80vh",
-        backgroundColor: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "80px 20px 60px 20px",
+        minHeight: "100vh",
+        backgroundColor: "#FCFCFC",
+        overflow: "auto"
       }}
     >
-      {sections.map((section, index) => (
-        <Section
-          key={section.id}
-          section={section}
-          index={index}
-          setSections={setSections}
-          sections={sections} // Thêm dòng này
-          setActiveItem={setActiveItem}
-          activeItem={activeItem}
-          setActiveStyles={setActiveStyles}
-          selectedItem={selectedItem}
-        />
-      ))}
+      <Box
+        sx={{
+          width: "800px",
+          height: "600px",
+          border: "1px solid #ddd",
+          backgroundColor: "#fff",
+        }}
+      >
+        {sections.map((section, index) => (
+          <Section
+            key={section.id}
+            section={section}
+            index={index}
+            setSections={setSections}
+            sections={sections}
+            setActiveItem={setActiveItem}
+            activeItem={activeItem}
+            setActiveStyles={setActiveStyles}
+            selectedItem={selectedItem}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };

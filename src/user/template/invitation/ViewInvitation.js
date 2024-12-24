@@ -4,7 +4,7 @@ import { userAPI } from "../../../service/user";
 import { Box, Typography, Snackbar, Alert } from "@mui/material";
 
 const ViewInvitation = () => {
-    const { id } = useParams();
+    const { id } = useParams(); // `id` là `linkName`
     const [invitation, setInvitation] = useState(null);
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,24 +15,30 @@ const ViewInvitation = () => {
     });
 
     useEffect(() => {
-        const fetchInvitation = async () => {
+        const fetchTemplateData = async () => {
             try {
-                const response = await userAPI.getInvitationById(id);
-                const invitationData = response.data;
+                const response = await userAPI.getTemplateUserBylinkName(id);
+                const data = response.data;
 
-                const processedSections = processMetadataToSections(invitationData.metadata);
-
-                setInvitation(invitationData);
-                setSections(processedSections);
+                if (data.invitation) {
+                    setInvitation(data.invitation);
+                    const processedSections = processMetadataToSections(data.invitation.metadata);
+                    setSections(processedSections);
+                } else if (data.section_user && data.section_user.length > 0) {
+                    const processedSections = processSectionUserToSections(data.section_user);
+                    setSections(processedSections);
+                } else {
+                    showSnackbar("Không tìm thấy lời mời hoặc dữ liệu!", "info");
+                }
             } catch (error) {
-                console.error("Error fetching invitation:", error);
-                showSnackbar("Không thể tải lời mời!", "error");
+                console.error("Error fetching template data:", error);
+                showSnackbar("Lỗi khi tải dữ liệu!", "error");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchInvitation();
+        fetchTemplateData();
     }, [id]);
 
     const showSnackbar = (message, severity) => {
@@ -40,7 +46,6 @@ const ViewInvitation = () => {
     };
 
     const renderComponent = (component) => {
-        console.log("component", component);
         switch (component.type) {
             case "text":
                 return (
@@ -58,12 +63,12 @@ const ViewInvitation = () => {
                             backgroundColor: component.style.fillColor,
                         }}
                     >
-                        <Typography variant={component.style.fontSize}>
-                            {component.text || "No text provided"}
+                        <Typography variant="body1">
+                            {component.text || "Text"}
                         </Typography>
                     </Box>
                 );
-            case "circle":
+            case "image":
                 return (
                     <Box
                         key={component.id}
@@ -73,91 +78,31 @@ const ViewInvitation = () => {
                             top: component.style.top,
                             width: component.style.width,
                             height: component.style.height,
-                            borderRadius: "50%",
-                            backgroundColor: component.style.fillColor,
-                            borderColor: component.style.borderColor || "",
-                            borderWidth: component.style.borderWidth || "0px",
-                            borderColor: component.style.borderColor || "",
-                            borderStyle: component.style.borderStyle || "none",
-                            opacity: component.style.opacity / 100 || "1",
+                            backgroundColor: component.style.fillColor || "#ccc",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            border: "1px dashed #aaa",
                         }}
                     >
-                        <img
-                            src={component.src}
-                            alt="image component"
-                            style={{
-                                width: component.style.width,
-                                height: component.style.height,
-                                objectFit: "cover",
-                                borderRadius:
-                                    component.type === "circle"
-                                        ? "50%"
-                                        : component.style.borderRadius,
-                            }}
-                        />
-                    </Box>
-                );
-            case "rect":
-                return (
-                    <Box
-                        key={component.id}
-                        sx={{
-                            position: "absolute",
-                            left: component.style.left,
-                            top: component.style.top,
-                            width: component.style.width,
-                            height: component.style.height,
-                            backgroundColor: component.style.fillColor || "#ccc", // Default color if not provided
-                            borderRadius: component.style.borderRadius || "0%",
-                            borderColor: component.style.borderColor || "",
-                            borderWidth: component.style.borderWidth || "0px",
-                            borderColor: component.style.borderColor || "",
-                            borderStyle: component.style.borderStyle || "none",
-                            opacity: component.style.opacity / 100 || "1",
-                        }}
-                    />
-                );
-            case "image":
-                if (!component.src) {
-                    return (
-                        <Box
-                            key={component.id}
-                            sx={{
-                                position: "absolute",
-                                left: component.style.left,
-                                top: component.style.top,
-                                width: component.style.width,
-                                height: component.style.height,
-                                backgroundColor: component.style.fillColor || "#ccc",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                border: "1px dashed #aaa", // Hiển thị khung thay thế
-                            }}
-                        >
+                        {component.src ? (
+                            <img
+                                src={component.src}
+                                alt="Image component"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                }}
+                            />
+                        ) : (
                             <Typography variant="caption" sx={{ color: "#aaa" }}>
                                 No image source
                             </Typography>
-                        </Box>
-                    );
-                }
-            // Handle line case
-            case "line":
-                return (
-                    <Box
-                        key={component.id}
-                        sx={{
-                            position: "absolute",
-                            left: component.style.left,
-                            top: component.style.top,
-                            width: component.style.width, // Width of the line
-                            height: component.style.height || 5, // Line height, default to 1px if not specified
-                            backgroundColor: component.style.lineColor, // Line color
-                            opacity: component.style.opacity / 100 || 1, // Set opacity
-                        }}
-                    />
+                        )}
+                    </Box>
                 );
-
+            // Other cases...
             default:
                 return null;
         }
@@ -173,12 +118,12 @@ const ViewInvitation = () => {
                     height: "100vh",
                 }}
             >
-                <Typography variant="h6">Đang tải lời mời...</Typography>
+                <Typography variant="h6">Đang tải dữ liệu...</Typography>
             </Box>
         );
     }
 
-    if (!invitation) {
+    if (!invitation && sections.length === 0) {
         return (
             <Box
                 sx={{
@@ -188,19 +133,23 @@ const ViewInvitation = () => {
                     height: "100vh",
                 }}
             >
-                <Typography variant="h6">Không tìm thấy lời mời.</Typography>
+                <Typography variant="h6">Không tìm thấy dữ liệu.</Typography>
             </Box>
         );
     }
 
     return (
         <Box sx={{ padding: 2 }}>
-            <Typography variant="h4" gutterBottom>
-                {invitation.title}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-                {invitation.message}
-            </Typography>
+            {invitation && (
+                <>
+                    <Typography variant="h4" gutterBottom>
+                        {invitation.title || "Untitled Invitation"}
+                    </Typography>
+                    <Typography variant="subtitle1" gutterBottom>
+                        {invitation.message || "No message provided"}
+                    </Typography>
+                </>
+            )}
             <Box
                 sx={{
                     display: "flex",
@@ -241,9 +190,17 @@ const processMetadataToSections = (metadata) => {
     const components = metadata?.components || [];
 
     return styles.map((styleItem, index) => ({
-        id: `section-${index + 1}`,
+        id: `section-${index}`,
         style: styleItem,
         components: components[index] || [],
+    }));
+};
+
+const processSectionUserToSections = (sectionUsers) => {
+    return sectionUsers.map((sectionUser, index) => ({
+        id: sectionUser.id || `section-${index}`,
+        style: sectionUser.metadata?.style || {},
+        components: sectionUser.metadata?.components || [],
     }));
 };
 

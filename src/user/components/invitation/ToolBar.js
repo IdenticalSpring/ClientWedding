@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, TextField, Input } from "@mui/material";
+import { Box, Tabs, Tab, TextField, Input, Button } from "@mui/material";
 import StyleEditor from "./StyleEditor";
 import {
   TextBox,
@@ -15,6 +15,10 @@ const Toolbar = ({
   handleStyleChange,
   invitationData,
   setInvitationData,
+  updateSections,
+  selectedComponent, // Current selected component
+  handleTextChange, // Function to update text content
+  handleFileUpload, // Function to handle image uploads
 }) => {
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -35,14 +39,6 @@ const Toolbar = ({
     setInvitationData((prevData) => ({
       ...prevData,
       [field]: value,
-    }));
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setInvitationData((prevData) => ({
-      ...prevData,
-      thumbnailUrl: file,
     }));
   };
 
@@ -74,28 +70,6 @@ const Toolbar = ({
       </Tabs>
 
       <Box sx={{ flexGrow: 1, width: "100%", mt: 2 }}>
-        {/* Shape Tab */}
-        {tabIndex === 2 && (
-          <Box>
-            <TextBox />
-            <ImageBox />
-            <Rectangle />
-            <Circle />
-            <Diamond />
-            <Line />
-          </Box>
-        )}
-
-        {/* Style Tab */}
-        {activeStyles && tabIndex === 1 && (
-          <Box>
-            <StyleEditor
-              activeStyles={activeStyles}
-              handleStyleChange={handleStyleChange}
-            />
-          </Box>
-        )}
-
         {/* General Tab */}
         {tabIndex === 0 && (
           <Box>
@@ -123,8 +97,59 @@ const Toolbar = ({
               onChange={(e) => handleInputChange("audience", e.target.value)}
               margin="normal"
             />
+          </Box>
+        )}
 
-           
+        {/* Style Tab */}
+        {activeStyles && tabIndex === 1 && (
+          <Box>
+            <StyleEditor
+              activeStyles={activeStyles}
+              handleStyleChange={handleStyleChange}
+            />
+          </Box>
+        )}
+
+        {/* Shape Tab */}
+        {tabIndex === 2 && (
+          <Box>
+            <TextBox />
+            <ImageBox />
+            <Rectangle />
+            <Circle />
+            <Diamond />
+            <Line />
+          </Box>
+        )}
+
+        {/* Additional Editing Tools */}
+        {selectedComponent && (
+          <Box sx={{ mt: 3 }}>
+            {/* Text Editing */}
+            {selectedComponent.type === "text" && (
+              <TextField
+                fullWidth
+                label="Text Content"
+                variant="outlined"
+                value={selectedComponent.text || ""}
+                onChange={(e) => handleTextChange(e.target.value)}
+                margin="normal"
+              />
+            )}
+
+            {/* Image Upload */}
+            {selectedComponent.type === "image" && (
+              <Box>
+                <Button variant="contained" component="label">
+                  Upload Image
+                  <Input
+                    type="file"
+                    onChange={handleFileUpload}
+                    hidden
+                  />
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
       </Box>

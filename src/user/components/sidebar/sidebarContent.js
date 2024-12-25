@@ -27,7 +27,7 @@ const SidebarContent = ({ template, onSectionClick }) => {
                     sx={{
                       position: "relative",
                       border: "1px dashed #ccc",
-                      minHeight: "300px",
+                      minHeight: "350px",
                       width: "766px",
                       backgroundColor: "#f9f9f9",
                       transform: "scale(0.3)",
@@ -38,10 +38,15 @@ const SidebarContent = ({ template, onSectionClick }) => {
                     onClick={() => onSectionClick(section)}
                   >
                     {section.metadata?.components?.map((component) => (
-                      <RenderComponent key={component.id} component={component} />
+                      <RenderComponent
+                        key={component.id}
+                        component={component}
+                        onClick={(e) => {
+                          if (e.stopPropagation) e.stopPropagation();
+                        }}
+                      />
                     ))}
                   </Box>
-
                 ))
             ) : (
               <Typography>No sections available.</Typography>

@@ -383,4 +383,18 @@ export const userAPI = {
       );
     }
   },
+  updateTemplateUser: async (id, data) => {
+    const response = await request.patch(`/templates_user/${id}`, data);
+    return response.data;
+  },
+  updateSectionUser: async (sectionId, data) => {
+    const response = await request.patch(`/section_user/${sectionId}`, data);
+    return response.data;
+  },
+  deleteTemplate: async (templateId) => {
+    const response = await request.delete(`/templates_user/${templateId}`);
+    return response.data;
+  },
+
+
 };

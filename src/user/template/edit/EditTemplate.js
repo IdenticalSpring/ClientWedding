@@ -22,7 +22,7 @@ import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
 import { toast } from 'react-toastify';
-
+import { useLocation } from "react-router-dom";
 const EditTemplate = () => {
   const userId=sessionStorage.getItem('userId');
   const { id } = useParams();
@@ -36,7 +36,7 @@ const EditTemplate = () => {
   const [isPreview, setIsPreview] = useState(false);
   const [linkName, setLinkName] = useState("");
   const [nameError, setNameError] = useState(false);
-
+  const location = useLocation();
   const handleLinkNameChange = (e) => setLinkName(e.target.value);
 
 
@@ -64,34 +64,49 @@ const EditTemplate = () => {
   };
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    const fetchTemplate = async () => {
-      try {
-        const response = await userAPI.getTemplateByIdEdit(id, userId);
-        const sortedSections = sortSectionsByPosition(response.data.sections || []);
-        setTemplate({ ...response.data, sections: sortedSections });
-      } catch (error) {
-        if (error?.response?.status === 400) {
-          toast.error('Hãy nâng cấp gói VIP để sử dụng template này.');
-        } else {
-          toast.error('Đã xảy ra lỗi khi tải template.');
-        }
-        navigate('/template');
-      } finally {
-        setLoading(false);
-      }
-      if (token) {
+    if (location.state?.isEditAction) {
+      // Chuyển sang gọi API `getTemplateUserById` nếu là hành động từ WebsiteManagement
+      const fetchTemplate = async () => {
         try {
-          const decoded = jwtDecode(token);
-          setIdUser(decoded.sub);
+          const response = await userAPI.getTemplateUserById(id); // Gọi API từ WebsiteManagement
+          const transformedSections = response.data?.section_user.map((section) => ({
+            ...section,
+            metadata: section.metadata || {}, // Đảm bảo metadata luôn tồn tại
+            components: section.components || [], // Đảm bảo components luôn tồn tại
+          }));
+          const sortedSections = sortSectionsByPosition(transformedSections || []);
+          setLinkName(response.data?.linkName || ""); 
+          setTemplate({ ...response, sections: sortedSections });
         } catch (error) {
-          console.error("Lỗi khi giải mã token:", error);
+          console.error("Lỗi khi gọi API:", error);
+          toast.error("Đã xảy ra lỗi khi tải template.");
+          navigate('/template');
+        } finally {
+          setLoading(false);
         }
-      }
-    };
+      };
 
-    fetchTemplate();
-  }, [id]);
+      fetchTemplate();
+    } else {
+      // Gọi API mặc định `getTemplateByIdEdit`
+      const fetchTemplate = async () => {
+        try {
+          const response = await userAPI.getTemplateByIdEdit(id, userId);
+          const sortedSections = sortSectionsByPosition(response.data.sections || []);
+          console.log("🚀 ~ file", sortedSections)
+          setTemplate({ ...response.data, sections: sortedSections });
+        } catch (error) {
+          console.error("Lỗi khi gọi API:", error);
+          toast.error("Đã xảy ra lỗi khi tải template.");
+          navigate('/template');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchTemplate();
+    }
+  }, [id, location.state]);
 
   const handleView = () => {
     setIsPreview((prev) => !prev);
@@ -128,6 +143,8 @@ const EditTemplate = () => {
   };
 
   const handleTextChange = (value) => {
+    console.log("🚀 ~ handleTextChange ~ value:", value)
+
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -195,7 +212,6 @@ const EditTemplate = () => {
   };
 
   const handleSave = async () => {
-    // Kiểm tra nếu tên cô dâu và chú rể không rỗng
     if (!linkName) {
       setNameError(true);
       showSnackbar("Vui lòng nhập tên link vào template!", "error");
@@ -203,46 +219,81 @@ const EditTemplate = () => {
     }
 
     try {
-      const updatedSections = sections.map((section, index) => ({
-        ...section,
-        position: String(index + 1), // Chuyển đổi position thành chuỗi
+      // Chuẩn bị dữ liệu sections
+      const updatedSections = template.sections.map((section, index) => ({
+        id: section.id, // Đảm bảo chỉ giữ lại ID
+        position: String(index + 1), // Cập nhật vị trí
+        metadata: section.metadata, // Chỉ gửi metadata
       }));
 
-      setSections(updatedSections);
-      const savedTemplate = await userAPI.createTemplateUser(
-        template,
-        idUser,
-        linkName
-      );
-      const templateID = savedTemplate.data?.id;
+      if (location.state?.isEditAction) {
+        // Cập nhật template
+        console.log("Updating template...");
+        const sanitizedTemplate = {
+          id: template.id,
+          name: template.name,
+          thumbnailUrl: template.thumbnailUrl,
+          description: template.description,
+          linkName,
+        };
+        console.log("Sanitized Template:", sanitizedTemplate);
 
-      if (!templateID) {
-        throw new Error("Không thể lấy được templateId!");
+        await userAPI.updateTemplateUser(template.data?.id, sanitizedTemplate);
+
+        // Cập nhật từng section
+        for (const section of updatedSections) {
+          console.log("Updating section:", section);
+          await userAPI.updateSectionUser(section.id, {
+            position: section.position,
+            metadata: section.metadata,
+          });
+        }
+
+        showSnackbar("Template và Sections đã được cập nhật!", "success");
+      } else {
+        // Tạo mới template
+        console.log("Creating new template...");
+        const sanitizedTemplate = {
+          name: template.name,
+          thumbnailUrl: template.thumbnailUrl,
+          description: template.description,
+          linkName,
+        };
+        console.log("Sanitized Template:", sanitizedTemplate);
+
+        const savedTemplate = await userAPI.createTemplateUser(sanitizedTemplate, userId, linkName);
+        const templateID = savedTemplate.data?.id;
+
+        console.log("New Template ID:", templateID);
+        if (!templateID) {
+          throw new Error("Không thể lấy được templateId!");
+        }
+
+        // Tạo mới các sections
+        const sectionsWithMetadata = updatedSections.map((section) => ({
+          template_userId: templateID,
+          position: section.position,
+          metadata: section.metadata,
+        }));
+
+        for (const section of sectionsWithMetadata) {
+          console.log("Creating section:", section);
+          await userAPI.createSectionUser(section);
+        }
+
+        showSnackbar("Template đã được tạo thành công!", "success");
       }
 
-      const sectionsWithMetadata = template.sections.map((section) => ({
-        template_userId: templateID,
-        position: section.position,
-        metadata: {
-          components: section.metadata.components,
-          style: section?.metadata?.style,
-        },
-      }));
-
-      for (const section of sectionsWithMetadata) {
-        await userAPI.createSectionUser(section);
-      }
-
-   
+      // Điều hướng đến URL mới
       const encodedLinkName = encodeURIComponent(linkName);
-      // const viewURL = `${window.location.origin}/view/${templateID}/${encodedBrideName}/${encodedGroomName}`;
-      // Sử dụng navigate để chuyển tới trang view
       navigate(`/${encodedLinkName}`);
     } catch (error) {
       console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");
     }
   };
+
+
   const handleBack = () => {
     navigate(-1);
   };

@@ -106,6 +106,28 @@ const WebsiteManagement = () => {
       }
     }
   };
+  const handleEditTemplate = (templateId) => {
+    // Điều hướng đến trang Edit Template và truyền thông tin qua state
+    navigate(`/template/edit/${templateId}`, { state: { isEditAction: true } });
+  };
+  const handleDeleteTemplate = async (templateId) => {
+    const confirmDelete = window.confirm(
+      "Bạn có chắc chắn muốn xóa template này không?"
+    );
+    if (confirmDelete) {
+      try {
+        await userAPI.deleteTemplate(templateId); // Gọi API xóa template
+        alert("Template đã được xóa thành công!");
+        setTemplates((prevTemplates) =>
+          prevTemplates.filter((template) => template.id !== templateId)
+        );
+      } catch (error) {
+        console.error("Lỗi khi xóa template:", error);
+        alert("Xóa template thất bại!");
+      }
+    }
+  };
+
   return (
     <>
       <Header />
@@ -154,6 +176,17 @@ const WebsiteManagement = () => {
                               <VisibilityIcon />
                             </IconButton>
                           </Tooltip>
+                          <Tooltip title="Chỉnh sửa Template">
+                            <IconButton onClick={() => handleEditTemplate(template.id)}>
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <IconButton
+                            onClick={() => handleDeleteTemplate(template.id)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </Box>
                       ) : (
                         <Typography color="error">Thiếu linkName</Typography>

@@ -16,7 +16,7 @@ const SidebarRight = ({
         top: 0,
         right: 0,
         width: "300px",
-        height: "600px",
+        height: "450px",
         background: "#fff",
         padding: " 65px 12px 12px 12px",
         border: "1px solid #ccc",

@@ -128,8 +128,6 @@ const EditTemplate = () => {
   };
 
   const handleTextChange = (value) => {
-    console.log("🚀 ~ handleTextChange ~ value:", value)
-
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,

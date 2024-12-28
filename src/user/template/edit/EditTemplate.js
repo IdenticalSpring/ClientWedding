@@ -257,6 +257,7 @@ const EditTemplate = () => {
           name: template.name,
           thumbnailUrl: template.thumbnailUrl,
           description: template.description,
+          templateId: `${id}`,
           linkName,
         };
         console.log("Sanitized Template:", sanitizedTemplate);

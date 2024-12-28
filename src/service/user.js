@@ -223,6 +223,7 @@ export const userAPI = {
       formData.append("thumbnailUrl", templateData.thumbnailUrl);
       formData.append("userId", UserId);
       formData.append("linkName", linkName);
+      formData.append("templateId", templateData.templateId);
   
       const response = await request.post("/templates_user", formData, {
         headers: {
@@ -395,6 +396,8 @@ export const userAPI = {
     const response = await request.delete(`/templates_user/${templateId}`);
     return response.data;
   },
-
-
+  updateInvitation: async (id, payload) => {
+    const response = await request.put(`/invitations_user/${id}`, payload);
+    return response.data;
+  },
 };

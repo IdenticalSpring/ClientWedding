@@ -75,7 +75,8 @@ const WebsiteManagement = () => {
   };
 
   const handleInvitationActions = (template) => {
-    navigate(`/invitation/${template.id}`);
+    sessionStorage.setItem("editInvitationData","");
+    navigate(`/invitation/edit/${template.id}`);
   };
 
   const handleViewInvitation = (template) => {
@@ -85,27 +86,8 @@ const WebsiteManagement = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  const handleCopyInvitation = (template) => {
-    const url = `${window.location.origin}/invitation/view/${template.linkName}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Đã sao chép liên kết thiệp cưới thành công!");
-    });
-  };
 
-  const handleDeleteInvitation = async (template) => {
-    const confirmDelete = window.confirm(
-      "Bạn có chắc chắn muốn xóa thiệp cưới này không?"
-    );
-    if (confirmDelete) {
-      try {
-        await userAPI.deleteInvitation(template.id); // Gọi API xóa thiệp cưới
-        alert("Thiệp cưới đã được xóa thành công!");
-      } catch (error) {
-        console.error("Lỗi khi xóa thiệp cưới:", error);
-        alert("Xóa thiệp cưới thất bại!");
-      }
-    }
-  };
+
   const handleEditTemplate = (templateId) => {
     // Điều hướng đến trang Edit Template và truyền thông tin qua state
     navigate(`/template/edit/${templateId}`, { state: { isEditAction: true } });
@@ -205,19 +187,6 @@ const WebsiteManagement = () => {
                           <Tooltip title="Xem Thiệp Mời">
                             <IconButton onClick={() => handleViewInvitation(template)}>
                               <PreviewIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Sao chép Thiệp Mời">
-                            <IconButton onClick={() => handleCopyInvitation(template)}>
-                              <CopyIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Xóa Thiệp Mời">
-                            <IconButton
-                              onClick={() => handleDeleteInvitation(template)}
-                              color="error"
-                            >
-                              <DeleteIcon />
                             </IconButton>
                           </Tooltip>
                         </Box>

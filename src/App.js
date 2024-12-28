@@ -12,20 +12,18 @@ import DashboardLayout from "./dashboard/Dashboard";
 import GuestList from "./dashboard/Clients";
 import PrivateRoute from "./components/privateRoute"; // import PrivateRoute
 import WebsiteManagement from "./dashboard/WebsiteManagement";
-import Calendar from "./dashboard/modal-event/Calendar";
 import Profile from "./user/profile";
 import ActivateAccountPage from "./sign-up/ActiveAccount";
 import TemplatePage from "./user/template/TemplatePage";
 import TemplateDetail from "./user/template/TemplateDetail";
 import EditTemplate from "./user/template/edit/EditTemplate";
 import ViewTemplate from "./user/template/edit/ViewTemplate";
-import PaymentSuccess from "./landing-page/components/PaymentStatusToast";
 import { ToastContainer } from "react-toastify";
 import PaymentStatusToast from "./landing-page/components/PaymentStatusToast";
 import WeddingList from "./dashboard/Wedding";
-import EditInvitation from "./user/template/invitation/CreateInvitation";
-import CreateInvitation from "./user/template/invitation/CreateInvitation";
-import ViewInvitation from "./user/template/invitation/ViewInvitation";
+
+import ViewInvitation from "./user/template/invitation/ViewInvitation"; 
+import EditInvitation from "./user/template/invitation/EditInvitation";
 
 function App() {
   // Giả sử bạn kiểm tra trạng thái đăng nhập từ sessionStorage
@@ -124,8 +122,8 @@ function App() {
           path="/:linkName"
           element={<ViewTemplate />}
         />
-        <Route path="/invitation/:id" element={<CreateInvitation />} />
-        <Route path="/invitation/view/:id" element={<ViewInvitation />} />
+        <Route path="/invitation/edit/:id" element={<EditInvitation />} />
+        <Route path="/invitation/view/:linkName" element={<ViewInvitation />} />
         
       </Routes>
       <PaymentStatusToast />

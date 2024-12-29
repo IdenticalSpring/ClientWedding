@@ -254,7 +254,7 @@ const handlePreviewToggle = () => {
                         backgroundColor: "#f9f9f9",
                         boxSizing: "border-box",
                         overflow: "hidden",
-                        marginLeft: 2
+                        margin: "auto",
                     }}
                 >
                     {metadata.components.flat().map((component) => (

@@ -400,4 +400,13 @@ export const userAPI = {
     const response = await request.put(`/invitations_user/${id}`, payload);
     return response.data;
   },
+  getGuestID: async (id) => {
+    try {
+      const response = await request.get(`/guest-list/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching guest by ID:", error);
+      throw error;
+    }
+  },
 };

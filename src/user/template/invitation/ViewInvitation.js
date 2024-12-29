@@ -4,40 +4,69 @@ import { Box, Typography } from "@mui/material";
 import { userAPI } from "../../../service/user";
 
 const ViewInvitation = () => {
-    const { linkName } = useParams();
-    const location = useLocation(); // Lấy thông tin từ state
+    const { linkName, id } = useParams();
+    const location = useLocation();
     const [invitation, setInvitation] = useState(null);
-    const isPreview = location.state?.isPreview || false; // Lấy isPreview từ state
+    const isPreview = location.state?.isPreview || false;
 
     useEffect(() => {
         const fetchInvitation = async () => {
             try {
+                let currentInvitation;
+
                 if (isPreview) {
-                    // Chế độ xem trước
+                    // Lấy dữ liệu từ sessionStorage nếu là chế độ xem trước
                     const storedInvitation = sessionStorage.getItem("editInvitationData");
                     if (storedInvitation) {
-                        setInvitation(JSON.parse(storedInvitation));
+                        currentInvitation = JSON.parse(storedInvitation);
                     } else {
                         console.error("No invitation data found in sessionStorage.");
                     }
                 } else if (linkName) {
-                    // Chế độ bình thường
+                    // Lấy dữ liệu từ API theo linkName
                     const response = await userAPI.getTemplateUserBylinkName(linkName);
                     if (response?.data?.invitation) {
-                        setInvitation(response.data.invitation);
+                        currentInvitation = response.data.invitation;
                     } else {
                         console.error("No invitation data found for linkName.");
                     }
-                } else {
-                    console.error("No valid data source found.");
+
+                    // Nếu có `id`, lấy thông tin khách mời và gắn tên vào component
+                    if (id) {
+                        try {
+                            const responseguest = await userAPI.getGuestID(id);
+                            console.log("Guest Name:", responseguest.data.name);
+
+                            // Gắn tên khách mời vào component có `id` chứa `-ten_khach`
+                            if (currentInvitation?.metadata?.components) {
+                                currentInvitation.metadata.components = currentInvitation.metadata.components.map(
+                                    (componentList) =>
+                                        componentList.map((component) => {
+                                            if (component.id.includes("-ten_khach")) {
+                                                return {
+                                                    ...component,
+                                                    text: responseguest.data.name, // Gắn tên khách mời vào đây
+                                                };
+                                            }
+                                            return component;
+                                        })
+                                );
+                            }
+                        } catch (error) {
+                            console.error("Error fetching guest data:", error);
+                        }
+                    }
                 }
+
+                setInvitation(currentInvitation);
             } catch (error) {
                 console.error("Error fetching invitation:", error);
             }
         };
 
         fetchInvitation();
-    }, [isPreview, linkName]);
+    }, [isPreview, linkName, id]);
+
 
     if (!invitation) {
         return (

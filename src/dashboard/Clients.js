@@ -21,8 +21,10 @@ import ModalConfirmDelete from "../dashboard/modal-clients/DeleteUser";
 import ModalAddUser from "../dashboard/modal-clients/CreateUser";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-
+import {  useNavigate } from "react-router-dom";
+import { Visibility as VisibilityIcon, CopyAll as CopyIcon} from "@mui/icons-material";
 const Clients = () => {
+  const navigate = useNavigate();
   const [guests, setGuests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -58,7 +60,13 @@ const Clients = () => {
       const response = await userAPI.getGuestList(limit, page, weddingId);
       const { guests, total } = response.data;
 
-      setGuests(guests);
+      // Nếu `linkName` chưa tồn tại, map để thêm từ weddingDetail.templateUser
+      const updatedGuests = guests.map((guest) => ({
+        ...guest,
+        linkName: guest.linkName || guest?.weddingDetail?.templateUser?.linkName || null,
+      }));
+
+      setGuests(updatedGuests);
       setTotalGuests(total);
     } catch (error) {
       setNotification({
@@ -70,6 +78,7 @@ const Clients = () => {
       setLoading(false);
     }
   };
+
 
   // Gọi API khi trang, số lượng bản ghi hoặc đám cưới thay đổi
   useEffect(() => {
@@ -86,11 +95,18 @@ const Clients = () => {
     setGuestToDelete(id);
     setOpenModal(true);
   };
-
+  const handlePreviewInvitation = (linkName,id) => {
+    navigate(`/view/${linkName}/${id}`);
+  };
   const handleEdit = (id) => {
     alert(`Chỉnh sửa khách mời có ID: ${id}`);
   };
-
+  const handleCopyInvitation = (linkName, id) => {
+    const url = `${window.location.origin}/view/${linkName}/${id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Đã sao chép liên kết thành công!");
+    });
+  };
   const columns = [
     { field: "name", headerName: "Tên khách mời", flex: 1 },
     { field: "email", headerName: "Email", flex: 1 },
@@ -113,9 +129,20 @@ const Clients = () => {
           label="Xóa"
           onClick={() => handleOpenModal(params.id)}
         />,
+        <GridActionsCellItem
+          icon={<VisibilityIcon />}
+          label="Hiện thiệp cưới"
+          onClick={() => handlePreviewInvitation(params.row.linkName,params.id)} 
+        />,
+        <GridActionsCellItem
+          icon={<CopyIcon />}
+          label="Sao chép thiệp cưới"
+          onClick={() => handleCopyInvitation(params.row.linkName, params.id)}
+        />,
       ],
     },
   ];
+
 
   return (
     <>

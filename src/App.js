@@ -124,7 +124,7 @@ function App() {
         />
         <Route path="/invitation/edit/:id" element={<EditInvitation />} />
         <Route path="/invitation/view/:linkName" element={<ViewInvitation />} />
-        
+        <Route path="/view/:linkName/:id" element={<ViewInvitation />} />
       </Routes>
       <PaymentStatusToast />
       <ToastContainer

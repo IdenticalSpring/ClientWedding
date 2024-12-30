@@ -26,11 +26,10 @@ const Wedding = () => {
   }, []);
 
   const columns = [
-    { field: "brideName", headerName: "Cô dâu", width: 90 },
-    { field: "groomName", headerName: "Chú rể", width: 150 },
-    { field: "eventDate", headerName: "Ngày tổ chức", width: 150 },
-    { field: "location", headerName: "Địa điểm", width: 150 },
-    // Thêm các cột khác nếu cần
+    { field: "brideName", headerName: "Cô dâu", flex: 1 },
+    { field: "groomName", headerName: "Chú rể", flex: 1 },
+    { field: "eventDate", headerName: "Ngày tổ chức", flex: 1 },
+    { field: "location", headerName: "Địa điểm", flex: 1 },
   ];
 
   return (

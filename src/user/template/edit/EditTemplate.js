@@ -93,7 +93,6 @@ const EditTemplate = () => {
         try {
           const response = await userAPI.getTemplateByIdEdit(id, userId);
           const sortedSections = sortSectionsByPosition(response.data.sections || []);
-          console.log("🚀 ~ file", sortedSections)
           setTemplate({ ...response.data, sections: sortedSections });
         } catch (error) {
           console.error("Lỗi khi gọi API:", error);
@@ -113,7 +112,6 @@ const EditTemplate = () => {
   };
 
   const handleStyleChange = (key, value) => {
-    console.log("Handle style change:", key, value);
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -143,8 +141,6 @@ const EditTemplate = () => {
   };
 
   const handleTextChange = (value) => {
-    console.log("🚀 ~ handleTextChange ~ value:", value)
-
     if (selectedComponent) {
       setSelectedComponent((prev) => ({
         ...prev,
@@ -227,8 +223,6 @@ const EditTemplate = () => {
       }));
 
       if (location.state?.isEditAction) {
-        // Cập nhật template
-        console.log("Updating template...");
         const sanitizedTemplate = {
           id: template.id,
           name: template.name,
@@ -236,13 +230,9 @@ const EditTemplate = () => {
           description: template.description,
           linkName,
         };
-        console.log("Sanitized Template:", sanitizedTemplate);
-
         await userAPI.updateTemplateUser(template.data?.id, sanitizedTemplate);
-
         // Cập nhật từng section
         for (const section of updatedSections) {
-          console.log("Updating section:", section);
           await userAPI.updateSectionUser(section.id, {
             position: section.position,
             metadata: section.metadata,
@@ -251,8 +241,6 @@ const EditTemplate = () => {
 
         showSnackbar("Template và Sections đã được cập nhật!", "success");
       } else {
-        // Tạo mới template
-        console.log("Creating new template...");
         const sanitizedTemplate = {
           name: template.name,
           thumbnailUrl: template.thumbnailUrl,
@@ -260,12 +248,9 @@ const EditTemplate = () => {
           templateId: `${id}`,
           linkName,
         };
-        console.log("Sanitized Template:", sanitizedTemplate);
-
         const savedTemplate = await userAPI.createTemplateUser(sanitizedTemplate, userId, linkName);
         const templateID = savedTemplate.data?.id;
 
-        console.log("New Template ID:", templateID);
         if (!templateID) {
           throw new Error("Không thể lấy được templateId!");
         }
@@ -278,7 +263,6 @@ const EditTemplate = () => {
         }));
 
         for (const section of sectionsWithMetadata) {
-          console.log("Creating section:", section);
           await userAPI.createSectionUser(section);
         }
 

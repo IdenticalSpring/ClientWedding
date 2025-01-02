@@ -156,4 +156,19 @@ const fonts = [
     url: "https://fonts.googleapis.com/css2?family=Pacifico&display=swap",
   },
 ];
+
+export const loadFonts = () => {
+  fonts.forEach((font) => {
+    if (font.url) {
+      // Tạo <link> nếu URL có sẵn và font chưa được tải
+      if (!document.querySelector(`link[href="${font.url}"]`)) {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = font.url;
+        document.head.appendChild(link);
+      }
+    }
+  });
+};
+
 export default fonts;

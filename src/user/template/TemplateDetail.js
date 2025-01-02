@@ -194,22 +194,29 @@ const TemplateDetail = (props) => {
               [...template.sections]
                 .sort((a, b) => parseInt(a.position) - parseInt(b.position))
                 .map((section) => (
-                  <Box
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    md={4}
                     key={section.id}
-                    sx={{
-                      position: section.metadata?.style.position,
-                      border: section.metadata?.style.border,
-                      padding: section.metadata?.style.padding,
-                      minHeight: section.metadata?.style.minHeight,
-                      marginBottom: section.metadata?.style.marginBottom,
-                      width: section.metadata?.style.minWidth,
-                      backgroundColor: section.metadata?.style.backgroundColor,
-                    }}
                   >
-                    {/* Render the components inside the section */}
-                    {section.metadata?.components?.map(renderComponent)}
-                  </Box>
-
+                    <Box
+                      sx={{
+                        position: section.metadata?.style.position,
+                        border: section.metadata?.style.border,
+                        padding: section.metadata?.style.padding,
+                        minHeight: section.metadata?.style.minHeight,
+                        marginBottom: section.metadata?.style.marginBottom,
+                        width: section.metadata?.style.minWidth,
+                        backgroundColor:
+                          section.metadata?.style.backgroundColor,
+                      }}
+                    >
+                      {/* Render the components inside the section */}
+                      {section.metadata?.components?.map(renderComponent)}
+                    </Box>
+                  </Grid>
                 ))
             ) : (
               <Typography>No sections available.</Typography>

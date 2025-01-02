@@ -1,5 +1,35 @@
 const fonts = [
   {
+    label: "Arial",
+    value: "arial",
+    family: "Arial, sans-serif",
+    url: "",
+  },
+  {
+    label: "Courier New",
+    value: "courier-new",
+    family: "'Courier New', monospace",
+    url: "",
+  },
+  {
+    label: "Georgia",
+    value: "georgia",
+    family: "Georgia, serif",
+    url: "",
+  },
+  {
+    label: "Times New Roman",
+    value: "times-new-roman",
+    family: "'Times New Roman', serif",
+    url: "",
+  },
+  {
+    label: "Verdana",
+    value: "verdana",
+    family: "Verdana, sans-serif",
+    url: "",
+  },
+  {
     label: "Montserrat",
     value: "montserrat",
     family: "'Montserrat', sans-serif",
@@ -126,3 +156,4 @@ const fonts = [
     url: "https://fonts.googleapis.com/css2?family=Pacifico&display=swap",
   },
 ];
+export default fonts;

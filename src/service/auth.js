@@ -2,7 +2,7 @@ import axios from "axios";
 import { Modal } from "antd";
 import Cookies from "js-cookie";
 
-const baseURL = `${process.env.REACT_APP_API_URL}`;
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
 export const registerUser = async (payload) => {
   const url = `${baseURL}/auth/register`;

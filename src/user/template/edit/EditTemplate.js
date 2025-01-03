@@ -422,7 +422,7 @@ const EditTemplate = () => {
               backgroundColor: "#f9f9f9",
               boxSizing: "border-box",
               overflow: "hidden",
-              marginLeft: 2
+              margin: "auto",
             }}
           >
             {selectedSection.metadata?.components?.map((component) => {

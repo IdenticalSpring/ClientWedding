@@ -113,7 +113,7 @@ const ComponentItem = ({
           fontSize: component.style.fontSize,
           fontFamily: component.style.fontFamily,
           color: component.style.color,
-          border: isHovered || active ? "1px solid #f50057" : "1px solid #ddd",
+          // border: isHovered || active ? "1px solid #f50057" : "1px solid #ddd",
           backgroundColor:
             component.type === "line"
               ? component.style.fillColor

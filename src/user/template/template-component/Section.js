@@ -185,7 +185,7 @@ const Section = ({
       ref={dropRef}
       sx={{
         position: section.metadata.style.position,
-        border: isHovered ? "2px solid #2196f3" : "1px dashed #ccc",
+        // border: isHovered ? "2px solid #2196f3" : "1px dashed #ccc",
         padding: section.metadata.style.padding,
         marginBottom: section.metadata.style.marginBottom,
         minWidth: section.metadata.style.minWidth,

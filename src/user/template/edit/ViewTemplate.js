@@ -4,7 +4,7 @@ import { userAPI } from "../../../service/user";
 import { Box, Typography, Snackbar, Alert } from "@mui/material";
 
 const ViewTemplate = () => {
-  const { linkName} = useParams();
+  const { linkName } = useParams();
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({

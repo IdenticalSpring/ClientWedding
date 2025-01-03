@@ -1,18 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../service/user";
-import { Box, Typography, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import Canvas from "../template/template-component/Canvas";
+
 const TemplateDetail = (props) => {
   const { id } = useParams();
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [scale, setScale] = useState(1);
+  const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const isPanning = useRef(false);
+  const startPoint = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
         const response = await userAPI.getTemplateById(id);
-
-        setTemplate(response.data);
+        const sortedSections = response.data.sections.sort((a, b) => {
+          // Giả sử section có thuộc tính 'position' là một số hoặc string có thể so sánh
+          return a.position - b.position; // Nếu position là số, sử dụng cách này
+          // Hoặc nếu position là chuỗi có thể so sánh:
+          // return a.position.localeCompare(b.position);
+        });
+        setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
         console.error("Error fetching template:", error);
       } finally {
@@ -23,130 +42,32 @@ const TemplateDetail = (props) => {
     fetchTemplate();
   }, [id]);
 
-  const renderComponent = (component) => {
-    switch (component.type) {
-      case "text":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width,
-              height: component.style.height,
-              fontSize: component.style.fontSize,
-              color: component.style.color,
-              fontFamily: component.style.fontFamily,
-            }}
-          >
-            <Typography variant={component.style.fontSize}>
-              {component.text || "No text provided"}
-            </Typography>
-          </Box>
-        );
-      case "circle":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width,
-              height: component.style.height,
-              borderRadius: component.style.borderRadius || "0%",
-              backgroundColor: component.style.fillColor,
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderStyle: component.style.borderStyle || "none",
-              opacity: component.style.opacity / 100 || "1",
-            }}
-          >
-            <img
-              src={component.src || ""}
-              alt="image component"
-              style={{
-                width: component.style.width,
-                height: component.style.height,
-                objectFit: "cover",
-                borderRadius:
-                  component.type === "circle"
-                    ? "50%"
-                    : component.style.borderRadius,
-              }}
-            />
-          </Box>
-        );
-      case "rect":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width,
-              height: component.style.height,
-              backgroundColor: component.style.fillColor || "#ccc", // Default color if not provided
-              borderRadius: component.style.borderRadius || "0%",
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderStyle: component.style.borderStyle || "none",
-              opacity: component.style.opacity / 100 || "1",
-            }}
-          />
-        );
-      case "image":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width,
-              height: component.style.height,
-              overflow: "hidden",
-              borderRadius: component.style.borderRadius || "0%",
-              borderColor: component.style.borderColor || "",
-              borderWidth: component.style.borderWidth || "0px",
-              borderStyle: component.style.borderStyle || "none",
-              opacity: component.style.opacity / 100 || "1",
-            }}
-          >
-            <img
-              src={component.src ? component.src : ""}
-              alt="image component"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover", // Adjust image to fit box
-              }}
-            />
-          </Box>
-        );
-      // Handle line case
-      case "line":
-        return (
-          <Box
-            key={component.id}
-            sx={{
-              position: "absolute",
-              left: component.style.left,
-              top: component.style.top,
-              width: component.style.width, // Width of the line
-              height: component.style.height || 5, // Line height, default to 1px if not specified
-              backgroundColor: component.style.lineColor, // Line color
-              opacity: component.style.opacity / 100 || 1, // Set opacity
-            }}
-          />
-        );
-
-      default:
-        return null;
-    }
+  const handleWheel = (event) => {
+    event.preventDefault();
+    setScale((prevScale) => {
+      const delta = event.deltaY > 0 ? -0.1 : 0.1;
+      return Math.min(Math.max(prevScale + delta, 0.5), 3);
+    });
   };
+
+  const handleMouseDown = (event) => {
+    if (!event.shiftKey) return;
+    isPanning.current = true;
+    startPoint.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleMouseMove = (event) => {
+    if (!isPanning.current) return;
+    const dx = event.clientX - startPoint.current.x;
+    const dy = event.clientY - startPoint.current.y;
+    setTranslate((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    startPoint.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleMouseUp = () => {
+    isPanning.current = false;
+  };
+  console.log("Sections", template?.sections);
 
   if (loading) {
     return (
@@ -158,7 +79,7 @@ const TemplateDetail = (props) => {
           height: "100vh",
         }}
       >
-        <Typography variant="h6">Loading template...</Typography>
+        <CircularProgress />
       </Box>
     );
   }
@@ -179,52 +100,62 @@ const TemplateDetail = (props) => {
   }
 
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       <Box
         sx={{
-          padding: 2,
+          width: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#FCFCFC",
         }}
       >
-        <Grid spacing={2}>
-          <Grid item xs={12}>
-            {template.sections && template.sections.length > 0 ? (
-              [...template.sections]
-                .sort((a, b) => parseInt(a.position) - parseInt(b.position))
-                .map((section) => (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    key={section.id}
-                  >
-                    <Box
-                      sx={{
-                        position: section.metadata?.style.position,
-                        border: section.metadata?.style.border,
-                        padding: section.metadata?.style.padding,
-                        minHeight: section.metadata?.style.minHeight,
-                        marginBottom: section.metadata?.style.marginBottom,
-                        width: section.metadata?.style.minWidth,
-                        backgroundColor:
-                          section.metadata?.style.backgroundColor,
-                      }}
-                    >
-                      {/* Render the components inside the section */}
-                      {section.metadata?.components?.map(renderComponent)}
-                    </Box>
-                  </Grid>
-                ))
-            ) : (
-              <Typography>No sections available.</Typography>
-            )}
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            height: "100%",
+            overflow: "hidden",
+            flexDirection: "row",
+          }}
+        >
+          <Box
+            id="canvas"
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            sx={{
+              flex: 1,
+              position: "relative",
+              cursor: isPanning.current ? "grabbing" : "grab",
+              backgroundColor: "#FCFCFC",
+            }}
+          >
+            <Box
+              sx={{
+                transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
+                transformOrigin: "center",
+                transition: isPanning.current
+                  ? "none"
+                  : "transform 0.2s ease-out",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
+            >
+              <Canvas sections={template.sections} isViewMode={true} />
+            </Box>
+          </Box>
+        </Box>
+        <Snackbar open={false} autoHideDuration={3000} onClose={() => {}}>
+          <Alert severity="error">Error loading template!</Alert>
+        </Snackbar>
       </Box>
-    </>
+    </DndProvider>
   );
 };
 

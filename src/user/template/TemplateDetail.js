@@ -26,10 +26,7 @@ const TemplateDetail = (props) => {
       try {
         const response = await userAPI.getTemplateById(id);
         const sortedSections = response.data.sections.sort((a, b) => {
-          // Giả sử section có thuộc tính 'position' là một số hoặc string có thể so sánh
-          return a.position - b.position; // Nếu position là số, sử dụng cách này
-          // Hoặc nếu position là chuỗi có thể so sánh:
-          // return a.position.localeCompare(b.position);
+          return a.position - b.position;
         });
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
@@ -67,7 +64,6 @@ const TemplateDetail = (props) => {
   const handleMouseUp = () => {
     isPanning.current = false;
   };
-  console.log("Sections", template?.sections);
 
   if (loading) {
     return (
@@ -108,6 +104,11 @@ const TemplateDetail = (props) => {
           flexDirection: "column",
           height: "100vh",
           backgroundColor: "#FCFCFC",
+          "@media (max-width: 700px)": {
+            marginTop: "60px",
+            height: "auto",
+            flexDirection: "column",
+          },
         }}
       >
         <Box
@@ -116,6 +117,10 @@ const TemplateDetail = (props) => {
             height: "100%",
             overflow: "hidden",
             flexDirection: "row",
+            "@media (max-width: 700px)": {
+              flexDirection: "column",
+              overflow: "auto",
+            },
           }}
         >
           <Box
@@ -130,6 +135,9 @@ const TemplateDetail = (props) => {
               position: "relative",
               cursor: isPanning.current ? "grabbing" : "grab",
               backgroundColor: "#FCFCFC",
+              "@media (max-width: 700px)": {
+                overflow: "auto",
+              },
             }}
           >
             <Box
@@ -147,7 +155,19 @@ const TemplateDetail = (props) => {
                 position: "relative",
               }}
             >
-              <Canvas sections={template.sections} isViewMode={true} />
+              <Box
+                sx={{
+                  width: "var(--canvas-width, 800px)",
+                  height: "600px",
+                  position: "relative",
+                  "@media (max-width: 700px)": {
+                    width: "100%",
+                    height: "auto",
+                  },
+                }}
+              >
+                <Canvas sections={template.sections} isViewMode={true} />
+              </Box>
             </Box>
           </Box>
         </Box>

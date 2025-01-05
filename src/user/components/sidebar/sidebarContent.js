@@ -1,9 +1,17 @@
 import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
-import RenderComponent from "../render/RenderComponent";
-const SidebarContent = ({ template, onSectionClick }) => {
+import Canvas from "../../template/template-component/Canvas";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+const SidebarContent = ({
+  template,
+  onSectionClick,
+  setSections,
+  sections,
+}) => {
   return (
-    <div>
+    <DndProvider backend={HTML5Backend}>
       <Box>
         <Grid>
           <Grid>
@@ -21,31 +29,24 @@ const SidebarContent = ({ template, onSectionClick }) => {
             {template.sections && template.sections.length > 0 ? (
               [...template.sections]
                 .sort((a, b) => parseInt(a.position) - parseInt(b.position))
-                .map((section) => (
+                .map((section, index) => (
                   <Box
                     key={section.id}
                     sx={{
                       position: "relative",
                       border: "1px dashed #ccc",
-                      minHeight: "350px",
-                      width: "766px",
+                      height: "150px",
+                      width: "800px",
                       backgroundColor: "#f9f9f9",
                       transform: "scale(0.3)",
                       transformOrigin: "top left",
                       cursor: "pointer",
-                      marginBottom: "-120px",
+                      // marginBottom: "-120px",
                     }}
                     onClick={() => onSectionClick(section)}
                   >
-                    {section.metadata?.components?.map((component) => (
-                      <RenderComponent
-                        key={component.id}
-                        component={component}
-                        onClick={(e) => {
-                          if (e.stopPropagation) e.stopPropagation();
-                        }}
-                      />
-                    ))}
+                    {/* Render Canvas for each section */}
+                    <Canvas sections={[section]} isViewMode={true} />
                   </Box>
                 ))
             ) : (
@@ -54,7 +55,7 @@ const SidebarContent = ({ template, onSectionClick }) => {
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </DndProvider>
   );
 };
 

@@ -21,16 +21,15 @@ import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
 import RenderComponent from "../../components/render/RenderComponent";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import Canvas from "../template-component/Canvas";
 const EditTemplate = () => {
-  const userId=sessionStorage.getItem('userId');
+  const userId = sessionStorage.getItem("userId");
   const { id } = useParams();
   const navigate = useNavigate();
   const [template, setTemplate] = useState();
   const [loading, setLoading] = useState(true);
-  const [idUser, setIdUser] = useState(null);
-  const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [isPreview, setIsPreview] = useState(false);
@@ -39,11 +38,7 @@ const EditTemplate = () => {
   const location = useLocation();
   const handleLinkNameChange = (e) => setLinkName(e.target.value);
 
-
   const sectionRef = useRef(null);
-  const handleComponentClick = (component) => {
-    setSelectedComponent(component);
-  };
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -69,18 +64,22 @@ const EditTemplate = () => {
       const fetchTemplate = async () => {
         try {
           const response = await userAPI.getTemplateUserById(id); // Gọi API từ WebsiteManagement
-          const transformedSections = response.data?.section_user.map((section) => ({
-            ...section,
-            metadata: section.metadata || {}, // Đảm bảo metadata luôn tồn tại
-            components: section.components || [], // Đảm bảo components luôn tồn tại
-          }));
-          const sortedSections = sortSectionsByPosition(transformedSections || []);
-          setLinkName(response.data?.linkName || ""); 
+          const transformedSections = response.data?.section_user.map(
+            (section) => ({
+              ...section,
+              metadata: section.metadata || {}, // Đảm bảo metadata luôn tồn tại
+              components: section.components || [], // Đảm bảo components luôn tồn tại
+            })
+          );
+          const sortedSections = sortSectionsByPosition(
+            transformedSections || []
+          );
+          setLinkName(response.data?.linkName || "");
           setTemplate({ ...response, sections: sortedSections });
         } catch (error) {
           console.error("Lỗi khi gọi API:", error);
           toast.error("Đã xảy ra lỗi khi tải template.");
-          navigate('/template');
+          navigate("/template");
         } finally {
           setLoading(false);
         }
@@ -92,12 +91,14 @@ const EditTemplate = () => {
       const fetchTemplate = async () => {
         try {
           const response = await userAPI.getTemplateByIdEdit(id, userId);
-          const sortedSections = sortSectionsByPosition(response.data.sections || []);
+          const sortedSections = sortSectionsByPosition(
+            response.data.sections || []
+          );
           setTemplate({ ...response.data, sections: sortedSections });
         } catch (error) {
           console.error("Lỗi khi gọi API:", error);
           toast.error("Đã xảy ra lỗi khi tải template.");
-          navigate('/template');
+          navigate("/template");
         } finally {
           setLoading(false);
         }
@@ -113,53 +114,58 @@ const EditTemplate = () => {
 
   const handleStyleChange = (key, value) => {
     if (selectedComponent) {
-      setSelectedComponent((prev) => ({
-        ...prev,
-        style: { ...prev.style, [key]: value },
-      }));
+      const updatedComponent = {
+        ...selectedComponent,
+        style: { ...selectedComponent.style, [key]: value },
+      };
 
-      const updatedSections = template.sections.map((section) => ({
-        ...section,
-        metadata: {
-          ...section.metadata,
-          components: section.metadata.components.map((comp) =>
-            comp.id === selectedComponent.id
-              ? {
-                ...comp,
-                style: { ...comp.style, [key]: value },
-              }
-              : comp
-          ),
-        },
-      }));
+      setSelectedComponent(updatedComponent);
 
+      // Cập nhật trực tiếp template.sections
       setTemplate((prev) => ({
         ...prev,
-        sections: updatedSections,
+        sections: prev.sections.map((section) =>
+          section.id === selectedSection.id
+            ? {
+                ...section,
+                metadata: {
+                  ...section.metadata,
+                  components: section.metadata.components.map((comp) =>
+                    comp.id === selectedComponent.id ? updatedComponent : comp
+                  ),
+                },
+              }
+            : section
+        ),
       }));
     }
   };
 
   const handleTextChange = (value) => {
     if (selectedComponent) {
-      setSelectedComponent((prev) => ({
-        ...prev,
+      const updatedComponent = {
+        ...selectedComponent,
         text: value,
-      }));
+      };
 
-      const updatedSections = template.sections.map((section) => ({
-        ...section,
-        metadata: {
-          ...section.metadata,
-          components: section.metadata.components.map((comp) =>
-            comp.id === selectedComponent.id ? { ...comp, text: value } : comp
-          ),
-        },
-      }));
+      setSelectedComponent(updatedComponent);
 
+      // Cập nhật trực tiếp template.sections
       setTemplate((prev) => ({
         ...prev,
-        sections: updatedSections,
+        sections: prev.sections.map((section) =>
+          section.id === selectedSection.id
+            ? {
+                ...section,
+                metadata: {
+                  ...section.metadata,
+                  components: section.metadata.components.map((comp) =>
+                    comp.id === selectedComponent.id ? updatedComponent : comp
+                  ),
+                },
+              }
+            : section
+        ),
       }));
     }
   };
@@ -170,33 +176,30 @@ const EditTemplate = () => {
       try {
         const imageData = await userAPI.uploadImages(file);
         const imageURL = imageData.data.url;
-        // Cập nhật src trong selectedComponent
-        setSelectedComponent((prev) => ({
-          ...prev,
+
+        const updatedComponent = {
+          ...selectedComponent,
           src: imageURL,
-        }));
+        };
 
-        // Cập nhật src trong template.sections
-        const updatedSections = template.sections.map((section) => {
-          if (section.id === selectedSection.id) {
-            return {
-              ...section,
-              metadata: {
-                ...section.metadata,
-                components: section.metadata.components.map((comp) =>
-                  comp.id === selectedComponent.id
-                    ? { ...comp, src: imageURL }
-                    : comp
-                ),
-              },
-            };
-          }
-          return section;
-        });
+        setSelectedComponent(updatedComponent);
 
+        // Cập nhật trực tiếp template.sections
         setTemplate((prev) => ({
           ...prev,
-          sections: updatedSections,
+          sections: prev.sections.map((section) =>
+            section.id === selectedSection.id
+              ? {
+                  ...section,
+                  metadata: {
+                    ...section.metadata,
+                    components: section.metadata.components.map((comp) =>
+                      comp.id === selectedComponent.id ? updatedComponent : comp
+                    ),
+                  },
+                }
+              : section
+          ),
         }));
 
         showSnackbar("Upload ảnh thành công!", "success");
@@ -248,7 +251,11 @@ const EditTemplate = () => {
           templateId: `${id}`,
           linkName,
         };
-        const savedTemplate = await userAPI.createTemplateUser(sanitizedTemplate, userId, linkName);
+        const savedTemplate = await userAPI.createTemplateUser(
+          sanitizedTemplate,
+          userId,
+          linkName
+        );
         const templateID = savedTemplate.data?.id;
 
         if (!templateID) {
@@ -277,7 +284,6 @@ const EditTemplate = () => {
       showSnackbar(error.message || "Lưu thất bại!", "error");
     }
   };
-
 
   const handleBack = () => {
     navigate(-1);
@@ -316,9 +322,18 @@ const EditTemplate = () => {
       </Box>
     );
   }
-
   const sortedSections = sortSectionsByPosition(template.sections || []);
-
+  const updateComponent = (updatedComponent) => {
+    setSelectedSection((prev) => ({
+      ...prev,
+      metadata: {
+        ...prev.metadata,
+        components: prev.metadata.components.map((comp) =>
+          comp.id === updatedComponent.id ? updatedComponent : comp
+        ),
+      },
+    }));
+  };
   if (isPreview) {
     return (
       <Box
@@ -326,6 +341,10 @@ const EditTemplate = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#fff",
+          overflowY: "auto",
+          padding: 2,
         }}
       >
         {sortedSections.map((section, index) => (
@@ -333,22 +352,17 @@ const EditTemplate = () => {
             key={index}
             sx={{
               position: "relative",
-              border: "1px solid #ccc",
-              padding: 2,
-              minHeight: section.metadata.style.minHeight,
-              minWidth: section?.metadata?.style?.minWidth,
-              boxSizing: "border-box",
-              overflow: "hidden",
+              border: "1px dashed #ccc",
               marginBottom: 2,
+              padding: 2,
+              backgroundColor: "#f9f9f9",
             }}
           >
-            {section.metadata?.components?.map((component) => (
-              <RenderComponent
-                key={component.id}
-                component={component}
-                sectionRef={sectionRef}
-              />
-            ))}
+            <Canvas
+              sections={[section]} // Render từng section
+              isViewMode={true} // Đặt chế độ view
+              setActiveComponent={() => {}} // Không cần chọn component khi preview
+            />
           </Box>
         ))}
         <Button
@@ -359,9 +373,9 @@ const EditTemplate = () => {
             zIndex: 1000,
           }}
           variant="contained"
-          onClick={() => setIsPreview(false)}
+          onClick={() => setIsPreview(false)} // Thoát preview
         >
-          Thoát xem
+          Thoát Xem
         </Button>
       </Box>
     );
@@ -369,7 +383,11 @@ const EditTemplate = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <AppBar position="static" color="primary" sx={{ zIndex: 1, height: "60px" }}>
+      <AppBar
+        position="static"
+        color="primary"
+        sx={{ zIndex: 1, height: "60px" }}
+      >
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
             <ArrowBack />
@@ -396,7 +414,10 @@ const EditTemplate = () => {
         </Toolbar>
       </AppBar>
 
-      <Box ref={sectionRef} sx={{ display: "flex", flex: 1, alignItems: "center" }}>
+      <Box
+        ref={sectionRef}
+        sx={{ display: "flex", flex: 1, alignItems: "center" }}
+      >
         <Box
           sx={{
             width: "250px",
@@ -408,6 +429,7 @@ const EditTemplate = () => {
           <SidebarContent
             template={{ ...template, sections: sortedSections }}
             onSectionClick={handleSectionClick}
+            sections={template.sections}
           />
         </Box>
 
@@ -425,26 +447,20 @@ const EditTemplate = () => {
               margin: "auto",
             }}
           >
-            {selectedSection.metadata?.components?.map((component) => {
-              const updatedComponent = template.sections
-                .find((section) => section.id === selectedSection.id)
-                ?.metadata.components.find((comp) => comp.id === component.id);
-
-              return (
-                <RenderComponent
-                  key={component.id}
-                  component={updatedComponent || component}
-                  sectionRef={sectionRef}
-                  onClick={handleComponentClick}
-                />
-              );
-            })}
+            <Canvas
+              sections={[selectedSection]} // Render chỉ section đã chọn
+              isViewMode={false}
+              setActiveComponent={(component) =>
+                setSelectedComponent(component)
+              }
+            />
           </Box>
         ) : (
           <Typography>Select a section to edit.</Typography>
         )}
+
         <SidebarRight
-          selectedComponent={selectedComponent}
+          selectedComponent={selectedComponent} // Component được chọn
           handleTextChange={handleTextChange}
           handleStyleChange={handleStyleChange}
           handleFileUpload={handleFileUpload}
@@ -453,16 +469,13 @@ const EditTemplate = () => {
 
       {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
-       
         <TextField
           label="Nhập tên Link"
           value={linkName}
           onChange={handleLinkNameChange}
           fullWidth
           error={nameError && !linkName}
-          helperText={
-            nameError && !linkName ? "Vui lòng nhập tên link!" : ""
-          }
+          helperText={nameError && !linkName ? "Vui lòng nhập tên link!" : ""}
           sx={{ mb: 2 }}
         />
       </Box>

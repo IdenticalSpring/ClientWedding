@@ -396,7 +396,7 @@ const EditTemplate = () => {
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <AppBar
         position="fixed"
-        color="primary"
+        color="white"
         sx={{ zIndex: 1100, height: "60px" }}
       >
         <Toolbar>

@@ -11,16 +11,10 @@ import {
   Snackbar,
   Alert,
   TextField,
-  Slider,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import { ArrowBack, Visibility, Save } from "@mui/icons-material";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import SidebarContent from "../../components/sidebar/sidebarContent";
 import SidebarRight from "../../components/sidebar/SidebarRight";
-import RenderComponent from "../../components/render/RenderComponent";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import Canvas from "../template-component/Canvas";
@@ -35,10 +29,12 @@ const EditTemplate = () => {
   const [isPreview, setIsPreview] = useState(false);
   const [linkName, setLinkName] = useState("");
   const [nameError, setNameError] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const isPanning = useRef(false);
+  const startPoint = useRef({ x: 0, y: 0 });
   const location = useLocation();
   const handleLinkNameChange = (e) => setLinkName(e.target.value);
-
-  const sectionRef = useRef(null);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -56,6 +52,31 @@ const EditTemplate = () => {
       const positionB = parseInt(b.position, 10);
       return positionA - positionB;
     });
+  };
+  const handleWheel = (event) => {
+    event.preventDefault();
+    setScale((prevScale) => {
+      const delta = event.deltaY > 0 ? -0.1 : 0.1;
+      return Math.min(Math.max(prevScale + delta, 0.5), 3);
+    });
+  };
+
+  const handleMouseDown = (event) => {
+    if (!event.shiftKey) return;
+    isPanning.current = true;
+    startPoint.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleMouseMove = (event) => {
+    if (!isPanning.current) return;
+    const dx = event.clientX - startPoint.current.x;
+    const dy = event.clientY - startPoint.current.y;
+    setTranslate((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    startPoint.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleMouseUp = () => {
+    isPanning.current = false;
   };
 
   useEffect(() => {
@@ -323,17 +344,7 @@ const EditTemplate = () => {
     );
   }
   const sortedSections = sortSectionsByPosition(template.sections || []);
-  const updateComponent = (updatedComponent) => {
-    setSelectedSection((prev) => ({
-      ...prev,
-      metadata: {
-        ...prev.metadata,
-        components: prev.metadata.components.map((comp) =>
-          comp.id === updatedComponent.id ? updatedComponent : comp
-        ),
-      },
-    }));
-  };
+
   if (isPreview) {
     return (
       <Box
@@ -384,9 +395,9 @@ const EditTemplate = () => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <AppBar
-        position="static"
+        position="fixed"
         color="primary"
-        sx={{ zIndex: 1, height: "60px" }}
+        sx={{ zIndex: 1100, height: "60px" }}
       >
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
@@ -413,17 +424,26 @@ const EditTemplate = () => {
           </Snackbar>
         </Toolbar>
       </AppBar>
-
       <Box
-        ref={sectionRef}
-        sx={{ display: "flex", flex: 1, alignItems: "center" }}
+        sx={{
+          display: "flex",
+          height: "100%",
+          overflow: "hidden",
+          flexDirection: "row",
+        }}
       >
         <Box
           sx={{
+            marginTop: "60px",
             width: "250px",
+            position: "fixed",
+            left: 0,
+            top: 0,
+            height: "100vh",
             borderRight: "1px solid #ccc",
             padding: 2,
             backgroundColor: "#f4f4f4",
+            overflowY: "auto",
           }}
         >
           <SidebarContent
@@ -432,41 +452,64 @@ const EditTemplate = () => {
             sections={template.sections}
           />
         </Box>
-
-        {selectedSection ? (
-          <Box
-            sx={{
-              position: "relative",
-              border: "1px dashed #ccc",
-              padding: 2,
-              minHeight: selectedSection.metadata.style.minHeight,
-              minWidth: selectedSection?.metadata?.style?.minWidth,
-              backgroundColor: "#f9f9f9",
-              boxSizing: "border-box",
-              overflow: "hidden",
-              margin: "auto",
-            }}
-          >
-            <Canvas
-              sections={[selectedSection]} // Render chỉ section đã chọn
-              isViewMode={false}
-              setActiveComponent={(component) =>
-                setSelectedComponent(component)
-              }
-            />
-          </Box>
-        ) : (
-          <Typography>Select a section to edit.</Typography>
-        )}
-
-        <SidebarRight
-          selectedComponent={selectedComponent} // Component được chọn
-          handleTextChange={handleTextChange}
-          handleStyleChange={handleStyleChange}
-          handleFileUpload={handleFileUpload}
-        />
+        <Box
+          sx={{
+            marginLeft: "350px",
+            display: "flex",
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          {selectedSection ? (
+            <Box
+              id="canvas"
+              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              sx={{
+                marginTop: "60px",
+                flex: 1,
+                position: "relative",
+                cursor: isPanning.current ? "grabbing" : "grab",
+                backgroundColor: "#FCFCFC",
+              }}
+            >
+              <Canvas
+                sections={template.sections} // Render chỉ section đã chọn
+                isViewMode={false}
+                setActiveComponent={(component) =>
+                  setSelectedComponent(component)
+                }
+              />
+            </Box>
+          ) : (
+            <Typography>Select a section to edit.</Typography>
+          )}
+        </Box>
+        <Box
+          sx={{
+            marginTop: "60px",
+            width: "300px",
+            position: "fixed",
+            right: 0,
+            top: 0,
+            height: "100vh",
+            borderLeft: "1px solid #ccc",
+            padding: 2,
+            backgroundColor: "#f9f9f9",
+            overflowY: "auto",
+          }}
+        >
+          <SidebarRight
+            selectedComponent={selectedComponent}
+            handleTextChange={handleTextChange}
+            handleStyleChange={handleStyleChange}
+            handleFileUpload={handleFileUpload}
+          />
+        </Box>
       </Box>
-
       {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
       <Box sx={{ padding: 2 }}>
         <TextField

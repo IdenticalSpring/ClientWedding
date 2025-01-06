@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {loadFonts} from "./utils/fonts"
 
-loadFonts();
+// loadFonts();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <App />

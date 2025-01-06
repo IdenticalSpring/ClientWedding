@@ -11,6 +11,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Canvas from "../template/template-component/Canvas";
+import "../../css/font.css";
 
 const TemplateDetail = (props) => {
   const { id } = useParams();

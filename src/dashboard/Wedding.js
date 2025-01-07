@@ -14,9 +14,7 @@ const Wedding = () => {
 
   const fetchWeddings = async () => {
     try {
-      const token = sessionStorage.getItem("access_token");
-      const decoded = jwtDecode(token);
-      const userId = decoded?.sub;
+      const userId = sessionStorage.getItem("userId");
       const data = await userAPI.getAllWedding(userId);
       setWeddings(data.data);
     } catch (error) {

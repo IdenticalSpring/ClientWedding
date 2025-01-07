@@ -12,12 +12,10 @@ const PaymentStatusToast = () => {
     useEffect(() => {
         // Kiểm tra nếu pathname không phải là "/payment-status"
         if (location.pathname !== '/payment-status') {
-            console.log('Not on /payment-status, skipping');
             return;
         }
 
         if (hasProcessed.current) {
-            console.log('Already processed, skipping');
             return; // Nếu đã xử lý thì không thực hiện gì nữa
         }
 
@@ -25,10 +23,6 @@ const PaymentStatusToast = () => {
         const queryParams = new URLSearchParams(location.search);
         const status = queryParams.get('status');
         let orderCode = queryParams.get('orderCode');
-
-        console.log('Status:', status, 'OrderCode:', orderCode);
-
-        // Đảm bảo orderCode là một số
         orderCode = Number(orderCode);
 
         if (!orderCode || !status) {
@@ -55,7 +49,6 @@ const PaymentStatusToast = () => {
 
                 // Gửi request đến API để cập nhật trạng thái thanh toán
                 const response = await userAPI.updateSubscriptionStatus({ orderCode, success });
-                console.log('API Response:', response);
 
                 // Kiểm tra phản hồi từ API
                 if (response.status === 200) {

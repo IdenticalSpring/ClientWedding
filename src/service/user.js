@@ -8,7 +8,6 @@ const baseURL = process.env.REACT_APP_API_BASE_URL;
 export const activateAccount = async (token) => {
   try {
     const response = await axios.get(`${baseURL}/auth/activate?token=${token}`);
-    console.log("Account activated:", response.data);
     return response.data;
   } catch (error) {
     console.error(

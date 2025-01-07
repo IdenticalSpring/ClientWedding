@@ -44,8 +44,6 @@ export default function Profile() {
 
   const fetchUserData = async () => {
     try {
-      // const user = await userAPI.getInfoUser(); // Gọi API lấy thông tin người dùng
-      // console.log("user", user);
       setUserData({
         name: userData.name || "",
         email: userData.email || "",

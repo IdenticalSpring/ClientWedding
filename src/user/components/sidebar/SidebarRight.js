@@ -20,50 +20,16 @@ const SidebarRight = ({
     selectedComponent?.style?.fontFamily || "Arial"
   );
 
-  const loadFont = (url) => {
-    if (!document.querySelector(`link[href="${url}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = url;
-      document.head.appendChild(link);
-    }
-  };
-
-  const fontNames = [
-    { family: "Montserrat", label: "Montserrat" },
-    { family: "DancingScript", label: "Dancing Script" },
-    { family: "GreatVibes", label: "Great Vibes" },
-    { family: "AlexBrush", label: "Alex Brush" },
-    { family: "PlayfairDisplay", label: "Playfair Display" },
-    { family: "CormorantGaramond", label: "Cormorant Garamond" },
-    { family: "Quicksand", label: "Quicksand" },
-    { family: "PinyonScript", label: "Pinyon Script" },
-    { family: "Charm", label: "Charm" },
-    { family: "JosefinSans", label: "Josefin Sans" },
-    { family: "Raleway", label: "Raleway" },
-    { family: "Nunito", label: "Nunito" },
-    { family: "Roboto", label: "Roboto" },
-    { family: "Lora", label: "Lora" },
-    { family: "SourceSerifPro", label: "Source Serif Pro" },
-    { family: "Bellota", label: "Bellota" },
-    { family: "Philosopher", label: "Philosopher" },
-    { family: "AmaticSC", label: "Amatic SC" },
-    { family: "CormorantInfant", label: "Cormorant Infant" },
-    { family: "Bungee", label: "Bungee" },
-    { family: "Pacifico", label: "Pacifico" },
-  ]; 
-
   useEffect(() => {
     if (
       selectedComponent?.type === "text" &&
       selectedComponent.style?.fontFamily
     ) {
-      const currentFont = fontNames.find(
+      const currentFont = fonts.find(
         (font) => font.family === selectedComponent.style.fontFamily
       );
       if (currentFont) {
-        loadFont(currentFont.url);
-        setSelectedFont(selectedComponent.style.fontFamily); // Set fontFamily to the current selected font
+        setSelectedFont(selectedComponent.style.fontFamily);
       }
     }
   }, [selectedComponent]);
@@ -126,20 +92,14 @@ const SidebarRight = ({
             value={selectedFont}
             onChange={(e) => {
               const selectedFontFamily = e.target.value;
-              const selectedFontObj = fontNames.find(
-                (font) => font.family === selectedFontFamily
-              );
-              if (selectedFontObj) {
-                loadFont(selectedFontObj.url);
-              }
               handleStyleChange("fontFamily", selectedFontFamily);
-              setSelectedFont(selectedFontFamily); // Set the selected font in state
+              setSelectedFont(selectedFontFamily);
             }}
             fullWidth
             displayEmpty
             variant="outlined"
           >
-            {fontNames.map((font) => (
+            {fonts.map((font) => (
               <MenuItem
                 key={font.value}
                 value={font.family}

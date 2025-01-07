@@ -70,7 +70,6 @@ export default function Pricing() {
 
       if (response && response.data) {
         const { statusCode, message, paymentUrl } = response.data;
-        console.log('Subscription Response:', { statusCode, message, paymentUrl });
 
         // Universal modal state setting
         setModalMessage(message || 'Subscription processed');

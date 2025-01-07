@@ -197,7 +197,7 @@ const WebsiteManagement = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>;
+            </Table>
 
           </TableContainer>
         ) : (

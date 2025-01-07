@@ -98,7 +98,6 @@ const EditTemplate = () => {
           setLinkName(response.data?.linkName || "");
           setTemplate({ ...response, sections: sortedSections });
         } catch (error) {
-          console.error("Lỗi khi gọi API:", error);
           toast.error("Đã xảy ra lỗi khi tải template.");
           navigate("/template");
         } finally {
@@ -108,7 +107,6 @@ const EditTemplate = () => {
 
       fetchTemplate();
     } else {
-      // Gọi API mặc định `getTemplateByIdEdit`
       const fetchTemplate = async () => {
         try {
           const response = await userAPI.getTemplateByIdEdit(id, userId);
@@ -117,7 +115,6 @@ const EditTemplate = () => {
           );
           setTemplate({ ...response.data, sections: sortedSections });
         } catch (error) {
-          console.error("Lỗi khi gọi API:", error);
           toast.error("Đã xảy ra lỗi khi tải template.");
           navigate("/template");
         } finally {
@@ -142,7 +139,6 @@ const EditTemplate = () => {
 
       setSelectedComponent(updatedComponent);
 
-      // Cập nhật trực tiếp template.sections
       setTemplate((prev) => ({
         ...prev,
         sections: prev.sections.map((section) =>
@@ -171,7 +167,6 @@ const EditTemplate = () => {
 
       setSelectedComponent(updatedComponent);
 
-      // Cập nhật trực tiếp template.sections
       setTemplate((prev) => ({
         ...prev,
         sections: prev.sections.map((section) =>
@@ -205,7 +200,6 @@ const EditTemplate = () => {
 
         setSelectedComponent(updatedComponent);
 
-        // Cập nhật trực tiếp template.sections
         setTemplate((prev) => ({
           ...prev,
           sections: prev.sections.map((section) =>
@@ -225,7 +219,6 @@ const EditTemplate = () => {
 
         showSnackbar("Upload ảnh thành công!", "success");
       } catch (error) {
-        console.error("Lỗi khi upload ảnh:", error);
         showSnackbar("Lỗi khi upload ảnh", "error");
       }
     }
@@ -239,11 +232,10 @@ const EditTemplate = () => {
     }
 
     try {
-      // Chuẩn bị dữ liệu sections
       const updatedSections = template.sections.map((section, index) => ({
-        id: section.id, // Đảm bảo chỉ giữ lại ID
-        position: String(index + 1), // Cập nhật vị trí
-        metadata: section.metadata, // Chỉ gửi metadata
+        id: section.id,
+        position: String(index + 1),
+        metadata: section.metadata,
       }));
 
       if (location.state?.isEditAction) {
@@ -255,7 +247,6 @@ const EditTemplate = () => {
           linkName,
         };
         await userAPI.updateTemplateUser(template.data?.id, sanitizedTemplate);
-        // Cập nhật từng section
         for (const section of updatedSections) {
           await userAPI.updateSectionUser(section.id, {
             position: section.position,
@@ -283,7 +274,6 @@ const EditTemplate = () => {
           throw new Error("Không thể lấy được templateId!");
         }
 
-        // Tạo mới các sections
         const sectionsWithMetadata = updatedSections.map((section) => ({
           template_userId: templateID,
           position: section.position,
@@ -297,11 +287,9 @@ const EditTemplate = () => {
         showSnackbar("Template đã được tạo thành công!", "success");
       }
 
-      // Điều hướng đến URL mới
       const encodedLinkName = encodeURIComponent(linkName);
       navigate(`/${encodedLinkName}`);
     } catch (error) {
-      console.error("Lỗi khi lưu template và sections:", error);
       showSnackbar(error.message || "Lưu thất bại!", "error");
     }
   };
@@ -384,7 +372,7 @@ const EditTemplate = () => {
             zIndex: 1000,
           }}
           variant="contained"
-          onClick={() => setIsPreview(false)} // Thoát preview
+          onClick={() => setIsPreview(false)}
         >
           Thoát Xem
         </Button>
@@ -454,13 +442,14 @@ const EditTemplate = () => {
         </Box>
         <Box
           sx={{
-            marginLeft: "350px",
+            marginLeft: "300px",
             display: "flex",
             flex: 1,
-            alignItems: "center",
+            flexDirection: "column"
           }}
         >
           {selectedSection ? (
+            <>
             <Box
               id="canvas"
               onWheel={handleWheel}
@@ -473,55 +462,42 @@ const EditTemplate = () => {
                 flex: 1,
                 position: "relative",
                 cursor: isPanning.current ? "grabbing" : "grab",
-                backgroundColor: "#FCFCFC",
               }}
             >
               <Canvas
-                sections={template.sections} // Render chỉ section đã chọn
+                sections={template.sections}
                 isViewMode={false}
                 setActiveComponent={(component) =>
                   setSelectedComponent(component)
                 }
               />
             </Box>
+            <Box sx={{ width: "70%" }}>
+            <TextField
+              label="Nhập tên Link"
+              value={linkName}
+              onChange={handleLinkNameChange}
+              fullWidth
+              error={nameError && !linkName}
+              helperText={nameError && !linkName ? "Vui lòng nhập tên link!" : ""}
+              sx={{ mb: 2 }}
+            />
+          </Box>
+          </>
           ) : (
-            <Typography>Select a section to edit.</Typography>
+            <Typography sx={{ marginTop: "350px" }}>
+              Select a section to edit.
+            </Typography>
           )}
         </Box>
-        <Box
-          sx={{
-            marginTop: "60px",
-            width: "300px",
-            position: "fixed",
-            right: 0,
-            top: 0,
-            height: "100vh",
-            borderLeft: "1px solid #ccc",
-            padding: 2,
-            backgroundColor: "#f9f9f9",
-            overflowY: "auto",
-          }}
-        >
-          <SidebarRight
-            selectedComponent={selectedComponent}
-            handleTextChange={handleTextChange}
-            handleStyleChange={handleStyleChange}
-            handleFileUpload={handleFileUpload}
-          />
-        </Box>
-      </Box>
-      {/* Thêm các trường nhập tên cô dâu và chú rể ở cuối giao diện */}
-      <Box sx={{ padding: 2 }}>
-        <TextField
-          label="Nhập tên Link"
-          value={linkName}
-          onChange={handleLinkNameChange}
-          fullWidth
-          error={nameError && !linkName}
-          helperText={nameError && !linkName ? "Vui lòng nhập tên link!" : ""}
-          sx={{ mb: 2 }}
+        <SidebarRight
+          selectedComponent={selectedComponent}
+          handleTextChange={handleTextChange}
+          handleStyleChange={handleStyleChange}
+          handleFileUpload={handleFileUpload}
         />
       </Box>
+      
     </Box>
   );
 };

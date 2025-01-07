@@ -39,11 +39,12 @@ const SidebarRight = ({
   return (
     <Box
       sx={{
-        position: "absolute",
+        marginTop: "60px",
+        position: "fixed",
         top: 0,
         right: 0,
         width: "300px",
-        height: "450px",
+        height: "100vh",
         background: "#f9f9f9",
         padding: " 20px 16px",
         border: "1px solid #ccc",

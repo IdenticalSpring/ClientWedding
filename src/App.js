@@ -122,6 +122,10 @@ function App() {
           path="/:linkName"
           element={<ViewTemplate />}
         />
+        <Route
+          path="/:linkName/:guestId"
+          element={<ViewTemplate />}
+        />
         <Route path="/invitation/edit/:id" element={<EditInvitation />} />
         <Route path="/invitation/view/:linkName" element={<ViewInvitation />} />
         <Route path="/view/:linkName/:id" element={<ViewInvitation />} />

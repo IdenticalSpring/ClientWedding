@@ -13,8 +13,9 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Canvas from "../../template/template-component/Canvas";
 
 const ViewTemplate = () => {
-  const { linkName } = useParams();
+  const { linkName, guestId } = useParams();
   const [template, setTemplate] = useState(null);
+  const [guestData, setGuestData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -30,9 +31,13 @@ const ViewTemplate = () => {
     const fetchTemplate = async () => {
       try {
         const response = await userAPI.getTemplateUserBylinkName(linkName);
-        const sortedSections = response.data.section_user
-          ?.slice()
-          .sort((a, b) => a.position - b.position);
+        console.log("template", response.data);
+        // Safely handle section_user sorting
+        const sortedSections = response.data?.section_user
+          ? response.data.section_user
+            .slice()
+            .sort((a, b) => a.position - b.position)
+          : [];
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
         console.error("Error fetching template:", error);
@@ -42,8 +47,68 @@ const ViewTemplate = () => {
       }
     };
 
+    const fetchGuestData = async () => {
+      try {
+        const response = await userAPI.getGuestID(guestId);
+        setGuestData(response.data);
+        console.log("guestData", response.data);
+      } catch (error) {
+        console.error("Error fetching guest data:", error);
+        showSnackbar("Không thể tải thông tin khách mời!", "error");
+      }
+    };
+
     fetchTemplate();
-  }, [linkName]);
+    if (guestId) {
+      fetchGuestData();
+    }
+  }, [linkName, guestId]);
+
+  const updateComponentValues = (sections, guestData) => {
+    if (!sections || !Array.isArray(sections)) return [];
+
+    return sections.map((section) => {
+      if (!section?.metadata?.components) {
+        return section;
+      }
+
+      return {
+        ...section,
+        metadata: {
+          ...section.metadata,
+          components: section.metadata.components.map((component) => {
+            if (!guestData?.weddingDetail || !component || typeof component.id !== 'string') {
+              return component;
+            }
+
+            // Keep the original component
+            const updatedComponent = { ...component };
+            const componentId = String(component.id); // Ensure id is a string
+
+            // Check if ID contains specific keywords
+            if (componentId.includes("-ten_co_dau")) {
+              updatedComponent.text = guestData.weddingDetail.brideName;
+            }
+            else if (componentId.includes("-ten_chu_re")) {
+              updatedComponent.text = guestData.weddingDetail.groomName;
+            }
+            else if (componentId.includes("-thoi_gian")) {
+              updatedComponent.text = guestData.weddingDetail.eventDate;
+            }
+            else if (componentId.includes("-dia_diem")) {
+              updatedComponent.text = guestData.weddingDetail.location;
+            }
+            else if (componentId.includes("-ten_khach")) {
+              updatedComponent.text = guestData.name;
+            }
+
+            return updatedComponent;
+          }),
+        },
+      };
+    });
+  };
+
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
@@ -105,6 +170,8 @@ const ViewTemplate = () => {
     );
   }
 
+  const updatedSections = updateComponentValues(template?.sections, guestData);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <Box
@@ -142,9 +209,7 @@ const ViewTemplate = () => {
             sx={{
               transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
               transformOrigin: "center",
-              transition: isPanning.current
-                ? "none"
-                : "transform 0.2s ease-out",
+              transition: isPanning.current ? "none" : "transform 0.2s ease-out",
               width: "100%",
               height: "100%",
               display: "flex",
@@ -164,7 +229,7 @@ const ViewTemplate = () => {
                 },
               }}
             >
-              <Canvas sections={template.sections} isViewMode={true} />
+              <Canvas sections={updatedSections} isViewMode={true} />
             </Box>
           </Box>
         </Box>

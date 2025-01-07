@@ -95,14 +95,14 @@ const Clients = () => {
     setGuestToDelete(id);
     setOpenModal(true);
   };
-  const handlePreviewInvitation = (linkName,id) => {
-    navigate(`/view/${linkName}/${id}`);
+  const handlePreviewTemplate = (linkName,guestid) => {
+    navigate(`/${linkName}/${guestid}`);
   };
   const handleEdit = (id) => {
     alert(`Chỉnh sửa khách mời có ID: ${id}`);
   };
-  const handleCopyInvitation = (linkName, id) => {
-    const url = `${window.location.origin}/view/${linkName}/${id}`;
+  const handleCopyTemplate = (linkName, guestid) => {
+    const url = `${window.location.origin}/${linkName}/${guestid}`;
     navigator.clipboard.writeText(url).then(() => {
       alert("Đã sao chép liên kết thành công!");
     });
@@ -132,12 +132,12 @@ const Clients = () => {
         <GridActionsCellItem
           icon={<VisibilityIcon />}
           label="Hiện thiệp cưới"
-          onClick={() => handlePreviewInvitation(params.row.linkName,params.id)} 
+          onClick={() => handlePreviewTemplate(params.row.linkName,params.id)} 
         />,
         <GridActionsCellItem
           icon={<CopyIcon />}
           label="Sao chép thiệp cưới"
-          onClick={() => handleCopyInvitation(params.row.linkName, params.id)}
+          onClick={() => handleCopyTemplate(params.row.linkName, params.id)}
         />,
       ],
     },

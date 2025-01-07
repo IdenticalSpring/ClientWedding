@@ -40,7 +40,6 @@ const ModalCreateWedding = ({ open, onClose, fetchWeddings }) => {
         const decoded = jwtDecode(token);
         const response = await userAPI.getAllTemplateById(decoded.sub, 1, 100); // Page và limit cố định
         setTemplates(response.data?.data || []); // Lưu danh sách template
-        console.log("Template:", response.data);
       } catch (error) {
         console.error("Error fetching templates:", error);
       } finally {

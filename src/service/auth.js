@@ -8,17 +8,11 @@ export const registerUser = async (payload) => {
   const url = `${baseURL}/auth/register`;
 
   try {
-    console.log("Sending payload:", payload);
-
-    // Sử dụng axios để gửi POST request
     const response = await axios.post(url, payload, {
       headers: {
         "Content-Type": "application/json",
       },
     });
-
-    console.log("Response Status:", response.status);
-    console.log("API response:", response.data);
 
     if (response.status === 200 || response.status === 201) {
       // Hiển thị modal đăng ký thành công
@@ -40,7 +34,6 @@ export const registerUser = async (payload) => {
       return { success: false, message: response.data.message };
     }
   } catch (error) {
-    console.error("Error:", error);
     if (error.response) {
       // Hiển thị modal khi có lỗi từ server
       Modal.error({

@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { userAPI } from "../service/user";
-import { Typography, Button, Box } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ModalCreateWedding from "./modal-wedding/CreateWedding";
 import Header from "./components/Header";
+import {jwtDecode} from "jwt-decode";
 
 const Wedding = () => {
   const [weddings, setWeddings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [openCreateWeddingModal, setOpenCreateWeddingModal] = useState(false); // Modal thêm đám cưới
+  const [openCreateWeddingModal, setOpenCreateWeddingModal] = useState(false);
+
   const fetchWeddings = async () => {
     try {
-      const userId = 1; // Thay thế bằng userId thực tế
+      const token = sessionStorage.getItem("access_token");
+      const decoded = jwtDecode(token);
+      const userId = decoded?.sub;
       const data = await userAPI.getAllWedding(userId);
       setWeddings(data.data);
     } catch (error) {
@@ -35,12 +39,6 @@ const Wedding = () => {
   return (
     <>
       <Header />
-      {/* <Box sx={{ alignItems: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          Quản lý đám cưới
-        </Typography>
-      </Box> */}
-
       <Box
         sx={{
           display: "flex",
@@ -64,7 +62,7 @@ const Wedding = () => {
             alignSelf: "center",
           }}
           startIcon={<AddIcon />}
-          onClick={() => setOpenCreateWeddingModal(true)} // Mở modal thêm đám cưới
+          onClick={() => setOpenCreateWeddingModal(true)}
         >
           Thêm đám cưới
         </Button>

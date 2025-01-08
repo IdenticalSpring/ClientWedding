@@ -19,13 +19,13 @@ const Canvas = ({
         padding: "80px 20px 60px 20px",
         minHeight: "100vh",
         backgroundColor: "#FCFCFC",
-        overflow: "auto"
+        overflow: "auto",
       }}
     >
       <Box
         sx={{
-          width: "800px",
-          height: "500px",
+          width: "500px",
+          height: "800px",
           border: "1px solid #ddd",
           backgroundColor: "#fff",
         }}

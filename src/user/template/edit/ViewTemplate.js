@@ -35,8 +35,8 @@ const ViewTemplate = () => {
         // Safely handle section_user sorting
         const sortedSections = response.data?.section_user
           ? response.data.section_user
-            .slice()
-            .sort((a, b) => a.position - b.position)
+              .slice()
+              .sort((a, b) => a.position - b.position)
           : [];
         setTemplate({ ...response.data, sections: sortedSections });
       } catch (error) {
@@ -77,7 +77,11 @@ const ViewTemplate = () => {
         metadata: {
           ...section.metadata,
           components: section.metadata.components.map((component) => {
-            if (!guestData?.weddingDetail || !component || typeof component.id !== 'string') {
+            if (
+              !guestData?.weddingDetail ||
+              !component ||
+              typeof component.id !== "string"
+            ) {
               return component;
             }
 
@@ -88,17 +92,13 @@ const ViewTemplate = () => {
             // Check if ID contains specific keywords
             if (componentId.includes("-ten_co_dau")) {
               updatedComponent.text = guestData.weddingDetail.brideName;
-            }
-            else if (componentId.includes("-ten_chu_re")) {
+            } else if (componentId.includes("-ten_chu_re")) {
               updatedComponent.text = guestData.weddingDetail.groomName;
-            }
-            else if (componentId.includes("-thoi_gian")) {
+            } else if (componentId.includes("-thoi_gian")) {
               updatedComponent.text = guestData.weddingDetail.eventDate;
-            }
-            else if (componentId.includes("-dia_diem")) {
+            } else if (componentId.includes("-dia_diem")) {
               updatedComponent.text = guestData.weddingDetail.location;
-            }
-            else if (componentId.includes("-ten_khach")) {
+            } else if (componentId.includes("-ten_khach")) {
               updatedComponent.text = guestData.name;
             }
 
@@ -108,7 +108,6 @@ const ViewTemplate = () => {
       };
     });
   };
-
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
@@ -209,7 +208,9 @@ const ViewTemplate = () => {
             sx={{
               transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
               transformOrigin: "center",
-              transition: isPanning.current ? "none" : "transform 0.2s ease-out",
+              transition: isPanning.current
+                ? "none"
+                : "transform 0.2s ease-out",
               width: "100%",
               height: "100%",
               display: "flex",
@@ -220,8 +221,8 @@ const ViewTemplate = () => {
           >
             <Box
               sx={{
-                width: "var(--canvas-width, 800px)",
-                height: "600px",
+                width: "var(--canvas-width, 500px)",
+                height: "800px",
                 position: "relative",
                 "@media (max-width: 700px)": {
                   width: "100%",

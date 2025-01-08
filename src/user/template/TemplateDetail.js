@@ -158,8 +158,8 @@ const TemplateDetail = (props) => {
             >
               <Box
                 sx={{
-                  width: "var(--canvas-width, 800px)",
-                  height: "600px",
+                  width: "var(--canvas-width, 500px)",
+                  height: "800px",
                   position: "relative",
                   "@media (max-width: 700px)": {
                     width: "100%",

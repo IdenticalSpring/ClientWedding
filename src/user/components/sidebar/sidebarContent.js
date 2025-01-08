@@ -35,8 +35,8 @@ const SidebarContent = ({
                     sx={{
                       position: "relative",
                       border: "1px dashed #ccc",
-                      height: "150px",
-                      width: "800px",
+                      height: "800px",
+                      width: "500px",
                       backgroundColor: "#f9f9f9",
                       transform: "scale(0.3)",
                       transformOrigin: "top left",

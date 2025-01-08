@@ -385,7 +385,11 @@ const EditTemplate = () => {
       <AppBar
         position="fixed"
         color="white"
-        sx={{ zIndex: 1100, height: "60px" }}
+        sx={{
+          zIndex: 1100,
+          height: "60px",
+          backgroundColor: "rgba(255, 255, 255, .9)",
+        }}
       >
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={handleBack}>
@@ -445,45 +449,47 @@ const EditTemplate = () => {
             marginLeft: "300px",
             display: "flex",
             flex: 1,
-            flexDirection: "column"
+            flexDirection: "column",
           }}
         >
           {selectedSection ? (
             <>
-            <Box
-              id="canvas"
-              onWheel={handleWheel}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              sx={{
-                marginTop: "60px",
-                flex: 1,
-                position: "relative",
-                cursor: isPanning.current ? "grabbing" : "grab",
-              }}
-            >
-              <Canvas
-                sections={template.sections}
-                isViewMode={false}
-                setActiveComponent={(component) =>
-                  setSelectedComponent(component)
-                }
-              />
-            </Box>
-            <Box sx={{ width: "70%" }}>
-            <TextField
-              label="Nhập tên Link"
-              value={linkName}
-              onChange={handleLinkNameChange}
-              fullWidth
-              error={nameError && !linkName}
-              helperText={nameError && !linkName ? "Vui lòng nhập tên link!" : ""}
-              sx={{ mb: 2 }}
-            />
-          </Box>
-          </>
+              <Box
+                id="canvas"
+                onWheel={handleWheel}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                sx={{
+                  marginTop: "60px",
+                  flex: 1,
+                  position: "relative",
+                  cursor: isPanning.current ? "grabbing" : "grab",
+                }}
+              >
+                <Canvas
+                  sections={template.sections}
+                  isViewMode={false}
+                  setActiveComponent={(component) =>
+                    setSelectedComponent(component)
+                  }
+                />
+              </Box>
+              <Box sx={{ width: "70%" }}>
+                <TextField
+                  label="Nhập tên Link"
+                  value={linkName}
+                  onChange={handleLinkNameChange}
+                  fullWidth
+                  error={nameError && !linkName}
+                  helperText={
+                    nameError && !linkName ? "Vui lòng nhập tên link!" : ""
+                  }
+                  sx={{ mb: 2 }}
+                />
+              </Box>
+            </>
           ) : (
             <Typography sx={{ marginTop: "350px" }}>
               Select a section to edit.
@@ -497,7 +503,6 @@ const EditTemplate = () => {
           handleFileUpload={handleFileUpload}
         />
       </Box>
-      
     </Box>
   );
 };

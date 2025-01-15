@@ -140,21 +140,11 @@ function App() {
         />
         <Route
           path="/:linkName"
-          element={
-            <PrivateRoute
-              isAuthenticated={isAuthenticated}
               element={<ViewTemplate />}
-            />
-          }
         />
         <Route
           path="/:linkName/:guestId"
-          element={
-            <PrivateRoute
-              isAuthenticated={isAuthenticated}
               element={<ViewTemplate />}
-            />
-          }
         />
         <Route
           path="/invitation/edit/:id"
